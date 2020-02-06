@@ -1,13 +1,13 @@
-package com.group3.apiserver.entities;
+package com.group3.apiserver.entity;
 
 import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-@Table(name = "product_description", schema = "isi", catalog = "")
-public class ProductDescriptionEntity {
+@Table(name = "product_photograph", schema = "isi", catalog = "")
+public class ProductPhotographEntity {
     private int id;
-    private String content;
+    private String fileLocation;
     private int sequence;
     private int productId;
 
@@ -22,13 +22,13 @@ public class ProductDescriptionEntity {
     }
 
     @Basic
-    @Column(name = "content")
-    public String getContent() {
-        return content;
+    @Column(name = "file_location")
+    public String getFileLocation() {
+        return fileLocation;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setFileLocation(String fileLocation) {
+        this.fileLocation = fileLocation;
     }
 
     @Basic
@@ -55,15 +55,15 @@ public class ProductDescriptionEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ProductDescriptionEntity that = (ProductDescriptionEntity) o;
+        ProductPhotographEntity that = (ProductPhotographEntity) o;
         return id == that.id &&
                 sequence == that.sequence &&
                 productId == that.productId &&
-                Objects.equals(content, that.content);
+                Objects.equals(fileLocation, that.fileLocation);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, content, sequence, productId);
+        return Objects.hash(id, fileLocation, sequence, productId);
     }
 }

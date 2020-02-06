@@ -1,4 +1,4 @@
-package com.group3.apiserver.controllers;
+package com.group3.apiserver.controller;
 
 public class PurchaseOrderController {
 }

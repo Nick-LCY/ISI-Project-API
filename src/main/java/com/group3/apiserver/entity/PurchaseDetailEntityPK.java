@@ -1,4 +1,4 @@
-package com.group3.apiserver.entities;
+package com.group3.apiserver.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Id;

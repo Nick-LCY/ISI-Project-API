@@ -1,4 +1,4 @@
-package com.group3.apiserver.entities;
+package com.group3.apiserver.entity;
 
 import javax.persistence.*;
 import java.sql.Date;
