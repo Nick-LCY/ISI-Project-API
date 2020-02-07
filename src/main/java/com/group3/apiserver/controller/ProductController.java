@@ -3,6 +3,7 @@ package com.group3.apiserver.controller;
 import com.group3.apiserver.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -16,8 +17,16 @@ public class ProductController {
         this.productService = productService;
     }
 
+    /*
+    order_by:
+        1: ascending
+        0: descending
+     */
     @GetMapping("/products")
-    public List getProductList() {
-        return productService.sayHi();
+    public List getProductList(@RequestParam(name = "page", defaultValue = "1") Integer page,
+                               @RequestParam(name = "key", defaultValue = "") String key,
+                               @RequestParam(name = "category", defaultValue = "____") String category,
+                               @RequestParam(name = "order_by", defaultValue = "1") Integer orderBy) {
+        return productService.findProducts(page - 1, key, category, orderBy);
     }
 }
