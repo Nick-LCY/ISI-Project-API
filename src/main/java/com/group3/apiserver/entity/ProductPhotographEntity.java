@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-@Table(name = "product_photograph", schema = "isi", catalog = "")
+@Table(name = "product_photograph", schema = "isi")
 public class ProductPhotographEntity {
     private int id;
     private String fileLocation;

@@ -4,14 +4,14 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-@Table(name = "user", schema = "isi", catalog = "")
+@Table(name = "user", schema = "isi")
 public class UserEntity {
     private int id;
     private String name;
     private String email;
     private String pwd;
     private String shippingAddr;
-    private byte isVendor;
+    private boolean isVendor;
 
     @Id
     @Column(name = "id")
@@ -65,11 +65,11 @@ public class UserEntity {
 
     @Basic
     @Column(name = "is_vendor")
-    public byte getIsVendor() {
+    public boolean getIsVendor() {
         return isVendor;
     }
 
-    public void setIsVendor(byte isVendor) {
+    public void setIsVendor(boolean isVendor) {
         this.isVendor = isVendor;
     }
 

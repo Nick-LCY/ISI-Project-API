@@ -4,11 +4,11 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-@Table(name = "notification", schema = "isi", catalog = "")
+@Table(name = "notification", schema = "isi")
 public class NotificationEntity {
     private int id;
     private String content;
-    private byte isRead;
+    private boolean isRead;
     private int userId;
 
     @Id
@@ -33,11 +33,11 @@ public class NotificationEntity {
 
     @Basic
     @Column(name = "is_read")
-    public byte getIsRead() {
+    public boolean getIsRead() {
         return isRead;
     }
 
-    public void setIsRead(byte isRead) {
+    public void setIsRead(boolean isRead) {
         this.isRead = isRead;
     }
 

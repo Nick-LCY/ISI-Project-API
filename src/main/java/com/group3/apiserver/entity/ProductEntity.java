@@ -5,13 +5,13 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 @Entity
-@Table(name = "product", schema = "isi", catalog = "")
+@Table(name = "product", schema = "isi")
 public class ProductEntity {
     private int id;
     private String name;
     private String category;
     private BigDecimal price;
-    private byte outOfStock;
+    private boolean outOfStock;
     private String thumbnailLocation;
 
     @Id
@@ -56,11 +56,11 @@ public class ProductEntity {
 
     @Basic
     @Column(name = "out_of_stock")
-    public byte getOutOfStock() {
+    public boolean getOutOfStock() {
         return outOfStock;
     }
 
-    public void setOutOfStock(byte outOfStock) {
+    public void setOutOfStock(boolean outOfStock) {
         this.outOfStock = outOfStock;
     }
 

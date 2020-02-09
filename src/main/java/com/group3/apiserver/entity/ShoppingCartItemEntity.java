@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-@Table(name = "shopping_cart_item", schema = "isi", catalog = "")
+@Table(name = "shopping_cart_item", schema = "isi")
 @IdClass(ShoppingCartItemEntityPK.class)
 public class ShoppingCartItemEntity {
     private int userId;
