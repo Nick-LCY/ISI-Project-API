@@ -1,11 +1,15 @@
 package com.group3.apiserver.entity;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Objects;
 
 @Entity
 @Table(name = "product", schema = "isi")
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class ProductEntity {
     private int id;
     private String name;

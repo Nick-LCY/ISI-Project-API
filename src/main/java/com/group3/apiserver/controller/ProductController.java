@@ -5,11 +5,8 @@ import com.group3.apiserver.entity.ProductEntity;
 import com.group3.apiserver.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 public class ProductController {
@@ -20,10 +17,10 @@ public class ProductController {
         this.productService = productService;
     }
 
-    /*
-    order_by:
-        1: ascending
-        0: descending
+    /**
+     * order_by:
+     *  1: ascending
+     *  0: descending
      */
     @GetMapping("/products")
     public PaginationDTO<ProductEntity> getProductList(@RequestParam(name = "page", defaultValue = "1") Integer page,
@@ -34,7 +31,7 @@ public class ProductController {
     }
 
     @GetMapping("/product")
-    public ProductEntity getProduct(@RequestParam(name = "id", required = true) Integer id) {
+    public ProductEntity getProduct(@RequestParam(name = "id") Integer id) {
         return productService.findProduct(id);
     }
 }
