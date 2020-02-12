@@ -12,6 +12,8 @@ public class UserEntity {
     private String pwd;
     private String shippingAddr;
     private boolean isVendor;
+    private String token;
+    private String createTime;
 
     @Id
     @Column(name = "id")
@@ -73,6 +75,26 @@ public class UserEntity {
         this.isVendor = isVendor;
     }
 
+    @Basic
+    @Column(name = "token")
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    @Basic
+    @Column(name = "create_time")
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -83,11 +105,13 @@ public class UserEntity {
                 Objects.equals(name, that.name) &&
                 Objects.equals(email, that.email) &&
                 Objects.equals(pwd, that.pwd) &&
-                Objects.equals(shippingAddr, that.shippingAddr);
+                Objects.equals(shippingAddr, that.shippingAddr) &&
+                Objects.equals(token, that.token) &&
+                Objects.equals(createTime, that.createTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, email, pwd, shippingAddr, isVendor);
+        return Objects.hash(id, name, email, pwd, shippingAddr, isVendor, token, createTime);
     }
 }
