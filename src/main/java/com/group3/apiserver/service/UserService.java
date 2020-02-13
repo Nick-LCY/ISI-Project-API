@@ -1,6 +1,6 @@
 package com.group3.apiserver.service;
 
-import com.group3.apiserver.dto.LoginAndCreatUserDTO;
+import com.group3.apiserver.dto.UserManagementDTO;
 import com.group3.apiserver.entity.UserEntity;
 import com.group3.apiserver.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +20,8 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public LoginAndCreatUserDTO creatUser(String email, String pwd, String name, String shippingAddr) {
-        LoginAndCreatUserDTO creatUserDTO = new LoginAndCreatUserDTO();
+    public UserManagementDTO creatUser(String email, String pwd, String name, String shippingAddr) {
+        UserManagementDTO creatUserDTO = new UserManagementDTO();
         // Check if email has been used.
         if (userRepository.findByEmail(email).isPresent()) {
             creatUserDTO.setSuccess(false);
@@ -51,8 +51,8 @@ public class UserService {
         return creatUserDTO;
     }
 
-    public LoginAndCreatUserDTO login(String email, String pwd) {
-        LoginAndCreatUserDTO loginDTO = new LoginAndCreatUserDTO();
+    public UserManagementDTO login(String email, String pwd) {
+        UserManagementDTO loginDTO = new UserManagementDTO();
         // Find user by it's email
         Optional<UserEntity> userOptional = userRepository.findByEmail(email);
         if (userOptional.isPresent()) {
@@ -77,5 +77,45 @@ public class UserService {
         user.setToken(token);
         user.setCreateTime(Long.toString(System.currentTimeMillis()));
         return token;
+    }
+
+    public UserManagementDTO logout(String email) {
+        UserManagementDTO userManagementDTO = new UserManagementDTO();
+        // Find user by it's email
+        Optional<UserEntity> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isPresent()) {
+            UserEntity user = userOptional.get();
+            user.setToken(null);
+            user.setCreateTime(null);
+            userManagementDTO.setSuccess(true);
+        } else {
+            userManagementDTO.setSuccess(false);
+            userManagementDTO.setMessage("User not found.");
+        }
+        return userManagementDTO;
+    }
+
+    public UserManagementDTO changePwd(String email, String oldPwd, String newPwd) {
+        UserManagementDTO userManagementDTO = new UserManagementDTO();
+        // Find user by it's email
+        Optional<UserEntity> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isPresent()) {
+            UserEntity user = userOptional.get();
+            // Validate user's password
+            if (Objects.equals(oldPwd, user.getPwd())) {
+                userManagementDTO.setSuccess(true);
+                userManagementDTO.setToken(setTokenAndCreateTime(user));
+                // Set new password
+                user.setPwd(newPwd);
+                userRepository.save(user);
+            } else {
+                userManagementDTO.setSuccess(false);
+                userManagementDTO.setMessage("Wrong password.");
+            }
+        } else {
+            userManagementDTO.setSuccess(false);
+            userManagementDTO.setMessage("User not found.");
+        }
+        return userManagementDTO;
     }
 }

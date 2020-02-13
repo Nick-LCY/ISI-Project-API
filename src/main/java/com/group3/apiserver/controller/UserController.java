@@ -1,6 +1,6 @@
 package com.group3.apiserver.controller;
 
-import com.group3.apiserver.dto.LoginAndCreatUserDTO;
+import com.group3.apiserver.dto.UserManagementDTO;
 import com.group3.apiserver.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,16 +17,28 @@ public class UserController {
     }
 
     @PostMapping("/user")
-    public LoginAndCreatUserDTO createUser(@RequestParam(name = "email") String email,
-                                           @RequestParam(name = "pwd") String pwd,
-                                           @RequestParam(name = "name") String name,
-                                           @RequestParam(name = "shipping_addr") String shippingAddr){
+    public UserManagementDTO createUser(@RequestParam(name = "email") String email,
+                                        @RequestParam(name = "pwd") String pwd,
+                                        @RequestParam(name = "name") String name,
+                                        @RequestParam(name = "shipping_addr") String shippingAddr){
         return userService.creatUser(email, pwd, name, shippingAddr);
     }
 
     @PostMapping("/login")
-    public LoginAndCreatUserDTO login(@RequestParam(name = "email") String email,
-                                      @RequestParam(name = "pwd") String pwd) {
+    public UserManagementDTO login(@RequestParam(name = "email") String email,
+                                   @RequestParam(name = "pwd") String pwd) {
         return userService.login(email, pwd);
+    }
+
+    @PostMapping("/logout")
+    public UserManagementDTO logout(@RequestParam(name = "email") String email) {
+        return userService.logout(email);
+    }
+
+    @PostMapping("/change_pwd")
+    public UserManagementDTO changePwd(@RequestParam(name = "email") String email,
+                                       @RequestParam(name = "old_pwd") String oldPwd,
+                                       @RequestParam(name = "new_pwd") String newPwd) {
+        return userService.changePwd(email, oldPwd, newPwd);
     }
 }
