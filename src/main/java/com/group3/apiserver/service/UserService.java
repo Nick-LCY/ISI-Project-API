@@ -87,6 +87,7 @@ public class UserService {
             UserEntity user = userOptional.get();
             user.setToken(null);
             user.setCreateTime(null);
+            userRepository.save(user);
             userManagementDTO.setSuccess(true);
         } else {
             userManagementDTO.setSuccess(false);
