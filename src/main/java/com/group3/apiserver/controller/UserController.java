@@ -23,4 +23,10 @@ public class UserController {
                                            @RequestParam(name = "shipping_addr") String shippingAddr){
         return userService.creatUser(email, pwd, name, shippingAddr);
     }
+
+    @PostMapping("/login")
+    public LoginAndCreatUserDTO login(@RequestParam(name = "email") String email,
+                                      @RequestParam(name = "pwd") String pwd) {
+        return userService.login(email, pwd);
+    }
 }
