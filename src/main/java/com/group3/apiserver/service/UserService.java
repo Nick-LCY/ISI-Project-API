@@ -42,7 +42,8 @@ public class UserService {
                 creatUserDTO.setSuccess(true);
                 // Generate token and create time
                 creatUserDTO.setToken(setTokenAndCreateTime(user));
-                userRepository.save(user);
+                user = userRepository.save(user);
+                creatUserDTO.setId(user.getId());
             } else {
                 creatUserDTO.setSuccess(false);
                 creatUserDTO.setMessage("Invalid E-Mail address.");
@@ -62,7 +63,8 @@ public class UserService {
                 loginDTO.setSuccess(true);
                 // Generate token and create time
                 loginDTO.setToken(setTokenAndCreateTime(user));
-                userRepository.save(user);
+                user = userRepository.save(user);
+                loginDTO.setId(user.getId());
             } else {
                 loginDTO.setSuccess(false);
             }
@@ -70,13 +72,6 @@ public class UserService {
             loginDTO.setSuccess(false);
         }
         return loginDTO;
-    }
-
-    private String setTokenAndCreateTime(UserEntity user) {
-        String token = UUID.randomUUID().toString().replace("-", "");
-        user.setToken(token);
-        user.setCreateTime(Long.toString(System.currentTimeMillis()));
-        return token;
     }
 
     public UserManagementDTO logout(String email) {
@@ -104,11 +99,12 @@ public class UserService {
             UserEntity user = userOptional.get();
             // Validate user's password
             if (Objects.equals(oldPwd, user.getPwd())) {
-                userManagementDTO.setSuccess(true);
-                userManagementDTO.setToken(setTokenAndCreateTime(user));
                 // Set new password
                 user.setPwd(newPwd);
-                userRepository.save(user);
+                userManagementDTO.setSuccess(true);
+                userManagementDTO.setToken(setTokenAndCreateTime(user));
+                user = userRepository.save(user);
+                userManagementDTO.setId(user.getId());
             } else {
                 userManagementDTO.setSuccess(false);
                 userManagementDTO.setMessage("Wrong password.");
@@ -118,5 +114,12 @@ public class UserService {
             userManagementDTO.setMessage("User not found.");
         }
         return userManagementDTO;
+    }
+
+    private String setTokenAndCreateTime(UserEntity user) {
+        String token = UUID.randomUUID().toString().replace("-", "");
+        user.setToken(token);
+        user.setCreateTime(Long.toString(System.currentTimeMillis()));
+        return token;
     }
 }

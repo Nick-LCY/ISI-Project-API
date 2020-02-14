@@ -7,6 +7,8 @@ import lombok.Data;
 public class UserManagementDTO {
     private boolean success;
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
+    private Integer id;
+    @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private String token;
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private String message;
