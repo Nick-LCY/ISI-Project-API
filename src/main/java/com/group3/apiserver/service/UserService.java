@@ -42,8 +42,10 @@ public class UserService {
                 creatUserDTO.setSuccess(true);
                 // Generate token and create time
                 creatUserDTO.setToken(setTokenAndCreateTime(user));
-                user = userRepository.save(user);
-                creatUserDTO.setId(user.getId());
+                userRepository.save(user);
+                // Get auto generated id from database and set to DTO
+                Optional<UserEntity> userOptional = userRepository.findByEmail(user.getEmail());
+                userOptional.ifPresent(userEntity -> creatUserDTO.setId(userEntity.getId()));
             } else {
                 creatUserDTO.setSuccess(false);
                 creatUserDTO.setMessage("Invalid E-Mail address.");
