@@ -4,6 +4,7 @@ import com.group3.apiserver.dto.ShoppingCartManagementDTO;
 import com.group3.apiserver.dto.UserManagementDTO;
 import com.group3.apiserver.entity.ProductEntity;
 import com.group3.apiserver.entity.ShoppingCartItemEntity;
+import com.group3.apiserver.entity.ShoppingCartItemEntityPK;
 import com.group3.apiserver.entity.UserEntity;
 import com.group3.apiserver.repository.ProductRepository;
 import com.group3.apiserver.repository.ShoppingCartItemRepository;
@@ -18,7 +19,10 @@ import java.util.regex.Pattern;
 
 @Service
 public class UserService {
-    private final String AUTHENTICATION_FAIL = "Authentication failed";
+    private final String AUTHENTICATION_FAIL = "Authentication failed.";
+    private final String PRODUCT_NOT_FOUND = "Product not found.";
+    private final String USER_NOT_FOUND = "User not found.";
+
     private UserRepository userRepository;
     private ShoppingCartItemRepository shoppingCartItemRepository;
     private ProductRepository productRepository;
@@ -106,7 +110,7 @@ public class UserService {
             userManagementDTO.setSuccess(true);
         } else {
             userManagementDTO.setSuccess(false);
-            userManagementDTO.setMessage("User not found.");
+            userManagementDTO.setMessage(USER_NOT_FOUND);
         }
         return userManagementDTO;
     }
@@ -131,7 +135,7 @@ public class UserService {
             }
         } else {
             userManagementDTO.setSuccess(false);
-            userManagementDTO.setMessage("User not found.");
+            userManagementDTO.setMessage(USER_NOT_FOUND);
         }
         return userManagementDTO;
     }
@@ -175,7 +179,7 @@ public class UserService {
                 return shoppingCartManagementDTO;
             } else {
                 shoppingCartManagementDTO.setSuccess(false);
-                shoppingCartManagementDTO.setMessage("Product not found.");
+                shoppingCartManagementDTO.setMessage(PRODUCT_NOT_FOUND);
             }
         } else {
             shoppingCartManagementDTO.setSuccess(false);
@@ -192,6 +196,26 @@ public class UserService {
                 shoppingCartManagementDTO.addShoppingCartItemDTO(e.getProduct(), e.getQuantity());
             }
             shoppingCartManagementDTO.setSuccess(true);
+        } else {
+            shoppingCartManagementDTO.setSuccess(false);
+            shoppingCartManagementDTO.setMessage(AUTHENTICATION_FAIL);
+        }
+        return shoppingCartManagementDTO;
+    }
+
+    public ShoppingCartManagementDTO deleteShoppingCartItem(Integer userId, Integer productId, String token) {
+        ShoppingCartManagementDTO shoppingCartManagementDTO = new ShoppingCartManagementDTO();
+        if (userAuthentication(userId, token)) {
+            ShoppingCartItemEntityPK shoppingCartItemPK = new ShoppingCartItemEntityPK();
+            shoppingCartItemPK.setProductId(productId);
+            shoppingCartItemPK.setUserId(userId);
+            if (shoppingCartItemRepository.findById(shoppingCartItemPK).isPresent()) {
+                shoppingCartItemRepository.deleteById(shoppingCartItemPK);
+                shoppingCartManagementDTO.setSuccess(true);
+            } else {
+                shoppingCartManagementDTO.setSuccess(false);
+                shoppingCartManagementDTO.setMessage(PRODUCT_NOT_FOUND);
+            }
         } else {
             shoppingCartManagementDTO.setSuccess(false);
             shoppingCartManagementDTO.setMessage(AUTHENTICATION_FAIL);
