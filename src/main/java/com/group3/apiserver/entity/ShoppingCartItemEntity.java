@@ -12,7 +12,7 @@ public class ShoppingCartItemEntity {
     private int quantity;
     private ProductEntity product;
 
-    @ManyToOne(targetEntity = ProductEntity.class)
+    @ManyToOne(targetEntity = ProductEntity.class, cascade = CascadeType.REFRESH)
     @JoinColumn(name = "product_id", referencedColumnName = "id", insertable = false, updatable = false)
     public ProductEntity getProduct() {
         return product;

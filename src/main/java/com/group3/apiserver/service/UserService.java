@@ -2,8 +2,10 @@ package com.group3.apiserver.service;
 
 import com.group3.apiserver.dto.ShoppingCartManagementDTO;
 import com.group3.apiserver.dto.UserManagementDTO;
+import com.group3.apiserver.entity.ProductEntity;
 import com.group3.apiserver.entity.ShoppingCartItemEntity;
 import com.group3.apiserver.entity.UserEntity;
+import com.group3.apiserver.repository.ProductRepository;
 import com.group3.apiserver.repository.ShoppingCartItemRepository;
 import com.group3.apiserver.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ public class UserService {
     private final String AUTHENTICATION_FAIL = "Authentication failed";
     private UserRepository userRepository;
     private ShoppingCartItemRepository shoppingCartItemRepository;
+    private ProductRepository productRepository;
 
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
@@ -28,6 +31,11 @@ public class UserService {
     @Autowired
     public void setShoppingCartItemRepository(ShoppingCartItemRepository shoppingCartItemRepository) {
         this.shoppingCartItemRepository = shoppingCartItemRepository;
+    }
+
+    @Autowired
+    public void setProductRepository(ProductRepository productRepository) {
+        this.productRepository = productRepository;
     }
 
     public UserManagementDTO creatUser(String email, String pwd, String name, String shippingAddr) {
@@ -141,28 +149,46 @@ public class UserService {
     }
 
     public ShoppingCartManagementDTO modifyShoppingCartItem(Integer userId, Integer productId, Integer quantity, String token) {
+        ShoppingCartManagementDTO shoppingCartManagementDTO = new ShoppingCartManagementDTO();
         // Authenticate user
         if (userAuthentication(userId, token)) {
-            // fixme: return null for the newest inset object
             ShoppingCartItemEntity shoppingCartItem = new ShoppingCartItemEntity();
             shoppingCartItem.setUserId(userId);
-            shoppingCartItem.setProductId(productId);
-            shoppingCartItem.setQuantity(quantity);
-            shoppingCartItemRepository.saveAndFlush(shoppingCartItem);
-            return getShoppingCartItems(userId, token);
+            // Check if there is really has a product with this id
+            Optional<ProductEntity> productOptional = productRepository.findById(productId);
+            if (productOptional.isPresent()) {
+                // Save changes into database
+                shoppingCartItem.setProductId(productId);
+                shoppingCartItem.setQuantity(quantity);
+                shoppingCartItemRepository.save(shoppingCartItem);
+                // Get updated shopping cart items from database
+                for (ShoppingCartItemEntity e :
+                        shoppingCartItemRepository.findAllByUserId(userId)) {
+                    // The newest inserted one would be null if don't use this way
+                    if (e.getProductId() == productOptional.get().getId()) {
+                        shoppingCartManagementDTO.addShoppingCartItemDTO(productOptional.get(), e.getQuantity());
+                    } else {
+                        shoppingCartManagementDTO.addShoppingCartItemDTO(e.getProduct(), e.getQuantity());
+                    }
+                }
+                shoppingCartManagementDTO.setSuccess(true);
+                return shoppingCartManagementDTO;
+            } else {
+                shoppingCartManagementDTO.setSuccess(false);
+                shoppingCartManagementDTO.setMessage("Product not found.");
+            }
         } else {
-            ShoppingCartManagementDTO shoppingCartManagementDTO = new ShoppingCartManagementDTO();
             shoppingCartManagementDTO.setSuccess(false);
             shoppingCartManagementDTO.setMessage(AUTHENTICATION_FAIL);
-            return shoppingCartManagementDTO;
         }
+        return shoppingCartManagementDTO;
     }
 
     public ShoppingCartManagementDTO getShoppingCartItems(Integer userId, String token) {
         ShoppingCartManagementDTO shoppingCartManagementDTO = new ShoppingCartManagementDTO();
         if (userAuthentication(userId, token)) {
             for (ShoppingCartItemEntity e :
-                    shoppingCartItemRepository.findAll()) {
+                    shoppingCartItemRepository.findAllByUserId(userId)) {
                 shoppingCartManagementDTO.addShoppingCartItemDTO(e.getProduct(), e.getQuantity());
             }
             shoppingCartManagementDTO.setSuccess(true);
