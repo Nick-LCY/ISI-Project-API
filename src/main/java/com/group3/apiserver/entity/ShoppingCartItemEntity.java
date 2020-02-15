@@ -10,6 +10,17 @@ public class ShoppingCartItemEntity {
     private int userId;
     private int productId;
     private int quantity;
+    private ProductEntity product;
+
+    @ManyToOne(targetEntity = ProductEntity.class)
+    @JoinColumn(name = "product_id", referencedColumnName = "id", insertable = false, updatable = false)
+    public ProductEntity getProduct() {
+        return product;
+    }
+
+    public void setProduct(ProductEntity product) {
+        this.product = product;
+    }
 
     @Id
     @Column(name = "user_id")

@@ -1,8 +1,10 @@
 package com.group3.apiserver.controller;
 
+import com.group3.apiserver.dto.ShoppingCartManagementDTO;
 import com.group3.apiserver.dto.UserManagementDTO;
 import com.group3.apiserver.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,5 +42,19 @@ public class UserController {
                                        @RequestParam(name = "old_pwd") String oldPwd,
                                        @RequestParam(name = "new_pwd") String newPwd) {
         return userService.changePwd(email, oldPwd, newPwd);
+    }
+
+    @PostMapping("/shopping_cart")
+    public ShoppingCartManagementDTO modifyShoppingCart(@RequestParam(name = "user_id") Integer userId,
+                                                        @RequestParam(name = "product_id") Integer productId,
+                                                        @RequestParam(name = "quantity") Integer quantity,
+                                                        @RequestParam(name = "token") String token) {
+        return userService.modifyShoppingCartItem(userId, productId, quantity, token);
+    }
+
+    @GetMapping("/shopping_cart")
+    public ShoppingCartManagementDTO getShoppingCartItems(@RequestParam(name = "user_id") Integer userId,
+                                                          @RequestParam(name = "token") String token) {
+        return userService.getShoppingCartItems(userId, token);
     }
 }

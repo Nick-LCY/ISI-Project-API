@@ -1,11 +1,16 @@
 package com.group3.apiserver.service;
 
+import com.group3.apiserver.dto.ShoppingCartManagementDTO;
 import com.group3.apiserver.dto.UserManagementDTO;
+import com.group3.apiserver.entity.ShoppingCartItemEntity;
 import com.group3.apiserver.entity.UserEntity;
+import com.group3.apiserver.repository.ProductRepository;
+import com.group3.apiserver.repository.ShoppingCartItemRepository;
 import com.group3.apiserver.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -13,11 +18,18 @@ import java.util.regex.Pattern;
 
 @Service
 public class UserService {
+    private final String AUTHENTICATION_FAIL = "Authentication failed";
     private UserRepository userRepository;
+    private ShoppingCartItemRepository shoppingCartItemRepository;
 
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    @Autowired
+    public void setShoppingCartItemRepository(ShoppingCartItemRepository shoppingCartItemRepository) {
+        this.shoppingCartItemRepository = shoppingCartItemRepository;
     }
 
     public UserManagementDTO creatUser(String email, String pwd, String name, String shippingAddr) {
@@ -76,6 +88,7 @@ public class UserService {
         return loginDTO;
     }
 
+    // TODO: use user id to logout
     public UserManagementDTO logout(String email) {
         UserManagementDTO userManagementDTO = new UserManagementDTO();
         // Find user by it's email
@@ -93,6 +106,7 @@ public class UserService {
         return userManagementDTO;
     }
 
+    // TODO: user user id to change password
     public UserManagementDTO changePwd(String email, String oldPwd, String newPwd) {
         UserManagementDTO userManagementDTO = new UserManagementDTO();
         // Find user by it's email
@@ -123,5 +137,43 @@ public class UserService {
         user.setToken(token);
         user.setCreateTime(Long.toString(System.currentTimeMillis()));
         return token;
+    }
+
+    private Boolean userAuthentication(Integer id, String token) {
+        Optional<UserEntity> userOptional = userRepository.findById(id);
+        return userOptional.filter(userEntity -> Objects.equals(userEntity.getToken(), token)).isPresent();
+    }
+
+    public ShoppingCartManagementDTO modifyShoppingCartItem(Integer userId, Integer productId, Integer quantity, String token) {
+        // Authenticate user
+        if (userAuthentication(userId, token)) {
+            // fixme: return null for the newest inset object
+            ShoppingCartItemEntity shoppingCartItem = new ShoppingCartItemEntity();
+            shoppingCartItem.setUserId(userId);
+            shoppingCartItem.setProductId(productId);
+            shoppingCartItem.setQuantity(quantity);
+            shoppingCartItemRepository.saveAndFlush(shoppingCartItem);
+            return getShoppingCartItems(userId, token);
+        } else {
+            ShoppingCartManagementDTO shoppingCartManagementDTO = new ShoppingCartManagementDTO();
+            shoppingCartManagementDTO.setSuccess(false);
+            shoppingCartManagementDTO.setMessage(AUTHENTICATION_FAIL);
+            return shoppingCartManagementDTO;
+        }
+    }
+
+    public ShoppingCartManagementDTO getShoppingCartItems(Integer userId, String token) {
+        ShoppingCartManagementDTO shoppingCartManagementDTO = new ShoppingCartManagementDTO();
+        if (userAuthentication(userId, token)) {
+            for (ShoppingCartItemEntity e :
+                    shoppingCartItemRepository.findAll()) {
+                shoppingCartManagementDTO.addShoppingCartItemDTO(e.getProduct(), e.getQuantity());
+            }
+            shoppingCartManagementDTO.setSuccess(true);
+        } else {
+            shoppingCartManagementDTO.setSuccess(false);
+            shoppingCartManagementDTO.setMessage(AUTHENTICATION_FAIL);
+        }
+        return shoppingCartManagementDTO;
     }
 }
