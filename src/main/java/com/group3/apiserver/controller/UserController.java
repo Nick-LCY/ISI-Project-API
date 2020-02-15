@@ -33,15 +33,15 @@ public class UserController {
     }
 
     @PostMapping("/logout")
-    public UserManagementDTO logout(@RequestParam(name = "email") String email) {
-        return userService.logout(email);
+    public UserManagementDTO logout(@RequestParam(name = "id") Integer id) {
+        return userService.logout(id);
     }
 
     @PostMapping("/change_pwd")
-    public UserManagementDTO changePwd(@RequestParam(name = "email") String email,
+    public UserManagementDTO changePwd(@RequestParam(name = "id") Integer id,
                                        @RequestParam(name = "old_pwd") String oldPwd,
                                        @RequestParam(name = "new_pwd") String newPwd) {
-        return userService.changePwd(email, oldPwd, newPwd);
+        return userService.changePwd(id, oldPwd, newPwd);
     }
 
     @PostMapping("/shopping_cart")

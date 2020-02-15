@@ -4,13 +4,11 @@ import com.group3.apiserver.dto.ShoppingCartManagementDTO;
 import com.group3.apiserver.dto.UserManagementDTO;
 import com.group3.apiserver.entity.ShoppingCartItemEntity;
 import com.group3.apiserver.entity.UserEntity;
-import com.group3.apiserver.repository.ProductRepository;
 import com.group3.apiserver.repository.ShoppingCartItemRepository;
 import com.group3.apiserver.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -88,11 +86,10 @@ public class UserService {
         return loginDTO;
     }
 
-    // TODO: use user id to logout
-    public UserManagementDTO logout(String email) {
+    public UserManagementDTO logout(Integer id) {
         UserManagementDTO userManagementDTO = new UserManagementDTO();
-        // Find user by it's email
-        Optional<UserEntity> userOptional = userRepository.findByEmail(email);
+        // Find user by it's user id
+        Optional<UserEntity> userOptional = userRepository.findById(id);
         if (userOptional.isPresent()) {
             UserEntity user = userOptional.get();
             user.setToken(null);
@@ -106,11 +103,10 @@ public class UserService {
         return userManagementDTO;
     }
 
-    // TODO: user user id to change password
-    public UserManagementDTO changePwd(String email, String oldPwd, String newPwd) {
+    public UserManagementDTO changePwd(Integer id, String oldPwd, String newPwd) {
         UserManagementDTO userManagementDTO = new UserManagementDTO();
-        // Find user by it's email
-        Optional<UserEntity> userOptional = userRepository.findByEmail(email);
+        // Find user by it's user id
+        Optional<UserEntity> userOptional = userRepository.findById(id);
         if (userOptional.isPresent()) {
             UserEntity user = userOptional.get();
             // Validate user's password
