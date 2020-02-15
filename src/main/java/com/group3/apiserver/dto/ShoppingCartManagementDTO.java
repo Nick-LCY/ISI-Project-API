@@ -29,10 +29,10 @@ public class ShoppingCartManagementDTO {
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
     public static class ShoppingCartItemDTO {
         public ShoppingCartItemDTO(ProductEntity productEntity, Integer quantity) {
-            this.productEntity = productEntity;
+            this.product = productEntity;
             this.quantity = quantity;
         }
-        private ProductEntity productEntity;
+        private ProductEntity product;
         private Integer quantity;
     }
 }
