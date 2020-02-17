@@ -6,9 +6,11 @@ import com.group3.apiserver.entity.ProductEntity;
 import com.group3.apiserver.entity.ShoppingCartItemEntity;
 import com.group3.apiserver.entity.ShoppingCartItemEntityPK;
 import com.group3.apiserver.entity.UserEntity;
+import com.group3.apiserver.message.ErrorMessage;
 import com.group3.apiserver.repository.ProductRepository;
 import com.group3.apiserver.repository.ShoppingCartItemRepository;
 import com.group3.apiserver.repository.UserRepository;
+import com.group3.apiserver.util.AuthenticationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,13 +21,10 @@ import java.util.regex.Pattern;
 
 @Service
 public class UserService {
-    private final String AUTHENTICATION_FAIL = "Authentication failed.";
-    private final String PRODUCT_NOT_FOUND = "Product not found.";
-    private final String USER_NOT_FOUND = "User not found.";
-
     private UserRepository userRepository;
     private ShoppingCartItemRepository shoppingCartItemRepository;
     private ProductRepository productRepository;
+    private AuthenticationUtil authenticationUtil;
 
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
@@ -42,12 +41,17 @@ public class UserService {
         this.productRepository = productRepository;
     }
 
+    @Autowired
+    public void setAuthenticationUtil(AuthenticationUtil authenticationUtil) {
+        this.authenticationUtil = authenticationUtil;
+    }
+
     public UserManagementDTO creatUser(String email, String pwd, String name, String shippingAddr) {
         UserManagementDTO creatUserDTO = new UserManagementDTO();
         // Check if email has been used.
         if (userRepository.findByEmail(email).isPresent()) {
             creatUserDTO.setSuccess(false);
-            creatUserDTO.setMessage("E-Mail address has already been used.");
+            creatUserDTO.setMessage(ErrorMessage.EMAIL_VALIDATION_FAIL);
         } else {
             String validator = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08" +
                     "\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?" +
@@ -70,7 +74,7 @@ public class UserService {
                 userOptional.ifPresent(userEntity -> creatUserDTO.setId(userEntity.getId()));
             } else {
                 creatUserDTO.setSuccess(false);
-                creatUserDTO.setMessage("Invalid E-Mail address.");
+                creatUserDTO.setMessage(ErrorMessage.EMAIL_VALIDATION_FAIL);
             }
         }
         return creatUserDTO;
@@ -110,7 +114,7 @@ public class UserService {
             userManagementDTO.setSuccess(true);
         } else {
             userManagementDTO.setSuccess(false);
-            userManagementDTO.setMessage(USER_NOT_FOUND);
+            userManagementDTO.setMessage(ErrorMessage.USER_NOT_FOUND);
         }
         return userManagementDTO;
     }
@@ -131,11 +135,11 @@ public class UserService {
                 userManagementDTO.setId(user.getId());
             } else {
                 userManagementDTO.setSuccess(false);
-                userManagementDTO.setMessage("Wrong password.");
+                userManagementDTO.setMessage(ErrorMessage.WRONG_PASSWORD);
             }
         } else {
             userManagementDTO.setSuccess(false);
-            userManagementDTO.setMessage(USER_NOT_FOUND);
+            userManagementDTO.setMessage(ErrorMessage.USER_NOT_FOUND);
         }
         return userManagementDTO;
     }
@@ -147,15 +151,10 @@ public class UserService {
         return token;
     }
 
-    private Boolean userAuthentication(Integer id, String token) {
-        Optional<UserEntity> userOptional = userRepository.findById(id);
-        return userOptional.filter(userEntity -> Objects.equals(userEntity.getToken(), token)).isPresent();
-    }
-
     public ShoppingCartManagementDTO modifyShoppingCartItem(Integer userId, Integer productId, Integer quantity, String token) {
         ShoppingCartManagementDTO shoppingCartManagementDTO = new ShoppingCartManagementDTO();
         // Authenticate user
-        if (userAuthentication(userId, token)) {
+        if (authenticationUtil.userAuthentication(userId, token)) {
             ShoppingCartItemEntity shoppingCartItem = new ShoppingCartItemEntity();
             shoppingCartItem.setUserId(userId);
             // Check if there is really has a product with this id
@@ -179,18 +178,18 @@ public class UserService {
                 return shoppingCartManagementDTO;
             } else {
                 shoppingCartManagementDTO.setSuccess(false);
-                shoppingCartManagementDTO.setMessage(PRODUCT_NOT_FOUND);
+                shoppingCartManagementDTO.setMessage(ErrorMessage.PRODUCT_NOT_FOUND);
             }
         } else {
             shoppingCartManagementDTO.setSuccess(false);
-            shoppingCartManagementDTO.setMessage(AUTHENTICATION_FAIL);
+            shoppingCartManagementDTO.setMessage(ErrorMessage.AUTHENTICATION_FAIL);
         }
         return shoppingCartManagementDTO;
     }
 
     public ShoppingCartManagementDTO getShoppingCartItems(Integer userId, String token) {
         ShoppingCartManagementDTO shoppingCartManagementDTO = new ShoppingCartManagementDTO();
-        if (userAuthentication(userId, token)) {
+        if (authenticationUtil.userAuthentication(userId, token)) {
             for (ShoppingCartItemEntity e :
                     shoppingCartItemRepository.findAllByUserId(userId)) {
                 shoppingCartManagementDTO.addShoppingCartItemDTO(e.getProduct(), e.getQuantity());
@@ -198,14 +197,14 @@ public class UserService {
             shoppingCartManagementDTO.setSuccess(true);
         } else {
             shoppingCartManagementDTO.setSuccess(false);
-            shoppingCartManagementDTO.setMessage(AUTHENTICATION_FAIL);
+            shoppingCartManagementDTO.setMessage(ErrorMessage.AUTHENTICATION_FAIL);
         }
         return shoppingCartManagementDTO;
     }
 
     public ShoppingCartManagementDTO deleteShoppingCartItem(Integer userId, Integer productId, String token) {
         ShoppingCartManagementDTO shoppingCartManagementDTO = new ShoppingCartManagementDTO();
-        if (userAuthentication(userId, token)) {
+        if (authenticationUtil.userAuthentication(userId, token)) {
             ShoppingCartItemEntityPK shoppingCartItemPK = new ShoppingCartItemEntityPK();
             shoppingCartItemPK.setProductId(productId);
             shoppingCartItemPK.setUserId(userId);
@@ -214,11 +213,11 @@ public class UserService {
                 shoppingCartManagementDTO.setSuccess(true);
             } else {
                 shoppingCartManagementDTO.setSuccess(false);
-                shoppingCartManagementDTO.setMessage(PRODUCT_NOT_FOUND);
+                shoppingCartManagementDTO.setMessage(ErrorMessage.PRODUCT_NOT_FOUND);
             }
         } else {
             shoppingCartManagementDTO.setSuccess(false);
-            shoppingCartManagementDTO.setMessage(AUTHENTICATION_FAIL);
+            shoppingCartManagementDTO.setMessage(ErrorMessage.AUTHENTICATION_FAIL);
         }
         return shoppingCartManagementDTO;
     }

@@ -1,7 +1,7 @@
 package com.group3.apiserver.entity;
 
 import javax.persistence.*;
-import java.sql.Date;
+import java.util.Date;
 import java.util.Objects;
 
 @Entity
