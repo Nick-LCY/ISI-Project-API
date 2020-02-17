@@ -1,8 +1,9 @@
-package com.group3.apiserver.dto;
+package com.group3.apiserver.dto.purchase;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.group3.apiserver.dto.purchase.items.PurchaseItemsDTO;
 import lombok.Data;
 
 import java.util.List;
@@ -17,5 +18,5 @@ public class PurchaseManagementDTO {
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private List<PurchaseOrderDTO> PoInfo;
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
-    private PurchaseDetailDTO purchaseDetail;
+    private PurchaseItemsDTO purchaseDetail;
 }

@@ -1,7 +1,7 @@
 package com.group3.apiserver.controller;
 
-import com.group3.apiserver.dto.CreatePurchaseOrderDTO;
-import com.group3.apiserver.dto.PurchaseManagementDTO;
+import com.group3.apiserver.dto.purchase.CreatePurchaseOrderDTO;
+import com.group3.apiserver.dto.purchase.PurchaseManagementDTO;
 import com.group3.apiserver.service.PurchaseOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
