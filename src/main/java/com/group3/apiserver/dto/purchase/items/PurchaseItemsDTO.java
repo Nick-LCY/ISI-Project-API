@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class PurchaseItemsDTO {
-    private Integer poInfo;
+    private Integer poNo;
     private Date purchaseDate;
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private Date shipmentDate;

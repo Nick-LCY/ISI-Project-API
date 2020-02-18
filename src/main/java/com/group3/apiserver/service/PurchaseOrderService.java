@@ -60,7 +60,7 @@ public class PurchaseOrderService {
             }
             // Purchase order's basic info
             purchaseOrderEntity.setId(purchaseOrderId);
-            purchaseItemsDTO.setPoInfo(purchaseOrderId);
+            purchaseItemsDTO.setPoNo(purchaseOrderId);
 
             purchaseOrderEntity.setUserId(createPurchaseOrderDTO.getUserId());
             // fixme: Wrong time zone now
