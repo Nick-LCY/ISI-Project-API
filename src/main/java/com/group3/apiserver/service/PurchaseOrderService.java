@@ -111,4 +111,69 @@ public class PurchaseOrderService {
         }
         return purchaseManagementDTO;
     }
+
+    public PurchaseManagementDTO updatePurchaseOrderStatus(Integer userId, String token, Integer purchaseOrderId, Integer status) {
+        PurchaseManagementDTO purchaseManagementDTO = new PurchaseManagementDTO();
+        // User authentication
+        if (authenticationUtil.userAuthentication(userId, token)) {
+            Optional<PurchaseOrderEntity> purchaseOrderOptional = purchaseOrderRepository.findById(purchaseOrderId);
+            PurchaseOrderEntity purchaseOrder;
+            // Try to find the purchase order
+            if (purchaseOrderOptional.isPresent()) {
+                purchaseOrder = purchaseOrderOptional.get();
+                if (purchaseOrder.getUserId() != userId && !authenticationUtil.vendorAuthentication(userId, token)) {
+                    purchaseManagementDTO.setSuccess(false);
+                    purchaseManagementDTO.setMessage(ErrorMessage.HAVE_NO_RIGHT);
+                } else {
+                    if (purchaseOrder.getStatus() > 1) {
+                        // If status now is bigger than 1 (i.e. 2 or 3)
+                        // That means it's in status cancelled or shipped
+                        // So, no operations are allowed
+                        purchaseManagementDTO.setSuccess(false);
+                        purchaseManagementDTO.setMessage(ErrorMessage.CANNOT_CHANGE_SHIPPED_AND_CANCELLED);
+                    } else if (purchaseOrder.getStatus() >= status) {
+                        // If new status is bigger than old status
+                        // It should be belonged to one of these situations
+                        // 1: pending -> pending; 2: hold -> pending; 3: hold -> hold
+                        // So, these operations are not allowed.
+                        purchaseManagementDTO.setSuccess(false);
+                        purchaseManagementDTO.setMessage(ErrorMessage.CANNOT_CHANGE_TO_TARGET_STATUS);
+                    } else {
+                        // Now start to process base on different status
+                        if (status == 1 || status == 2) {
+                            if (authenticationUtil.vendorAuthentication(userId, token)) {
+                                purchaseOrder.setStatus(status);
+                                purchaseOrderRepository.save(purchaseOrder);
+                                purchaseManagementDTO.setSuccess(true);
+                            } else {
+                                purchaseManagementDTO.setSuccess(false);
+                                purchaseManagementDTO.setMessage(ErrorMessage.HAVE_NO_RIGHT);
+                            }
+                        } else if (status == 3) {
+                            if (authenticationUtil.vendorAuthentication(userId, token)) {
+                                purchaseOrder.setStatus(status);
+                                // 1 represents cancelled by vendor
+                                purchaseOrder.setCancelledBy(1);
+                                purchaseOrderRepository.save(purchaseOrder);
+                                purchaseManagementDTO.setSuccess(true);
+                            } else {
+                                purchaseOrder.setStatus(status);
+                                // 0 represents cancelled by user
+                                purchaseOrder.setCancelledBy(0);
+                                purchaseOrderRepository.save(purchaseOrder);
+                                purchaseManagementDTO.setSuccess(true);
+                            }
+                        }
+                    }
+                }
+            } else {
+                purchaseManagementDTO.setSuccess(false);
+                purchaseManagementDTO.setMessage(ErrorMessage.PURCHASE_ORDER_NOT_FOUND);
+            }
+        } else {
+            purchaseManagementDTO.setSuccess(false);
+            purchaseManagementDTO.setMessage(ErrorMessage.AUTHENTICATION_FAIL);
+        }
+        return purchaseManagementDTO;
+    }
 }

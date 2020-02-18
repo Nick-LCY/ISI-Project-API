@@ -21,4 +21,13 @@ public class AuthenticationUtil {
         Optional<UserEntity> userOptional = userRepository.findById(id);
         return userOptional.filter(userEntity -> Objects.equals(userEntity.getToken(), token)).isPresent();
     }
+
+    public Boolean vendorAuthentication(Integer id, String token) {
+        Optional<UserEntity> userOptional = userRepository.findById(id);
+        if (userAuthentication(id, token)) {
+            return userOptional.map(UserEntity::getIsVendor).orElse(false);
+        } else {
+            return false;
+        }
+    }
 }
