@@ -27,4 +27,12 @@ public class PurchaseOrderController {
                                                            @RequestParam(name = "status") Integer status) {
         return purchaseOrderService.updatePurchaseOrderStatus(userId, token, purchaseOrderId, status);
     }
+
+    @GetMapping("/purchase_orders")
+    public PurchaseManagementDTO getPurchaseOrders(@RequestParam(name = "user_id") Integer userId,
+                                                   @RequestParam(name = "token") Integer token,
+                                                   @RequestParam(name = "status") Integer status,
+                                                   @RequestParam(name = "page") Integer page) {
+        return purchaseOrderService.getPurchaseOrders(userId, token, status, page);
+    }
 }

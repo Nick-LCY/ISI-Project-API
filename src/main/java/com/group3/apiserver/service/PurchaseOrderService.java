@@ -60,7 +60,7 @@ public class PurchaseOrderService {
             }
             // Purchase order's basic info
             purchaseOrderEntity.setId(purchaseOrderId);
-            purchaseItemsDTO.setId(purchaseOrderId);
+            purchaseItemsDTO.setPoInfo(purchaseOrderId);
 
             purchaseOrderEntity.setUserId(createPurchaseOrderDTO.getUserId());
             // fixme: Wrong time zone now
@@ -143,6 +143,10 @@ public class PurchaseOrderService {
                         if (status == 1 || status == 2) {
                             if (authenticationUtil.vendorAuthentication(userId, token)) {
                                 purchaseOrder.setStatus(status);
+                                // fixme: still wrong timezone
+                                if (status == 2) {
+                                    purchaseOrder.setShipmentDate(new Date());
+                                }
                                 purchaseOrderRepository.save(purchaseOrder);
                                 purchaseManagementDTO.setSuccess(true);
                             } else {
@@ -150,19 +154,14 @@ public class PurchaseOrderService {
                                 purchaseManagementDTO.setMessage(ErrorMessage.HAVE_NO_RIGHT);
                             }
                         } else if (status == 3) {
-                            if (authenticationUtil.vendorAuthentication(userId, token)) {
-                                purchaseOrder.setStatus(status);
-                                // 1 represents cancelled by vendor
-                                purchaseOrder.setCancelledBy(1);
-                                purchaseOrderRepository.save(purchaseOrder);
-                                purchaseManagementDTO.setSuccess(true);
-                            } else {
-                                purchaseOrder.setStatus(status);
-                                // 0 represents cancelled by user
-                                purchaseOrder.setCancelledBy(0);
-                                purchaseOrderRepository.save(purchaseOrder);
-                                purchaseManagementDTO.setSuccess(true);
-                            }
+                            purchaseOrder.setStatus(status);
+                            // 1 represents cancelled by vendor, 0 represents cancelled by user
+                            purchaseOrder.setCancelledBy(
+                                    authenticationUtil.vendorAuthentication(userId, token)?1:0);
+                            // fixme: still wrong timezone
+                            purchaseOrder.setCancelDate(new Date());
+                            purchaseOrderRepository.save(purchaseOrder);
+                            purchaseManagementDTO.setSuccess(true);
                         }
                     }
                 }
@@ -175,5 +174,10 @@ public class PurchaseOrderService {
             purchaseManagementDTO.setMessage(ErrorMessage.AUTHENTICATION_FAIL);
         }
         return purchaseManagementDTO;
+    }
+
+    // TODO: To be finished
+    public PurchaseManagementDTO getPurchaseOrders(Integer userId, Integer token, Integer status, Integer page) {
+        return null;
     }
 }
