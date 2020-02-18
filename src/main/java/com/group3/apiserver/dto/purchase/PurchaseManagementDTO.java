@@ -8,14 +8,11 @@ import com.group3.apiserver.dto.purchase.items.PurchaseItemsDTO;
 import lombok.Data;
 
 @Data
+@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class PurchaseManagementDTO {
     private boolean success;
-    @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private String message;
-    // fixme: Still show even PoInfo is null
-    @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private PaginationDTO<PurchaseOrderDTO> PoInfo;
-    @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private PurchaseItemsDTO purchaseDetail;
 }

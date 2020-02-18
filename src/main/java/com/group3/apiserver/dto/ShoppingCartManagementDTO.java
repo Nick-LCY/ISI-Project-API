@@ -11,11 +11,10 @@ import java.util.List;
 
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
+@JsonInclude(value = JsonInclude.Include.NON_NULL)
 public class ShoppingCartManagementDTO {
     private boolean success;
-    @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private String message;
-    @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private List<ShoppingCartItemDTO> shoppingCartItems;
 
     public void addShoppingCartItemDTO(ProductEntity productEntity, Integer quantity) {
