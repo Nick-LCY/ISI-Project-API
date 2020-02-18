@@ -5,20 +5,20 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
 @Data
+@JsonInclude(value = JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class PurchaseItemsDTO {
     private Integer poNo;
     private Date purchaseDate;
-    @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private Date shipmentDate;
-    @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private Date cancelDate;
-    @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private Integer cancelledBy;
     private Integer status;
+    private BigDecimal totalAmount;
     private List<PurchaseDetailDTO> purchaseItems;
 }

@@ -15,6 +15,8 @@ import com.group3.apiserver.util.AuthenticationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Optional;
@@ -47,6 +49,7 @@ public class PurchaseOrderService {
         this.purchaseOrderRepository = purchaseOrderRepository;
     }
 
+    @Transactional
     public PurchaseManagementDTO createPurchaseOrder(CreatePurchaseOrderDTO createPurchaseOrderDTO) {
         PurchaseManagementDTO purchaseManagementDTO = new PurchaseManagementDTO();
         if (authenticationUtil.userAuthentication(createPurchaseOrderDTO.getUserId(), createPurchaseOrderDTO.getToken())) {
@@ -70,9 +73,13 @@ public class PurchaseOrderService {
 
             purchaseOrderEntity.setStatus(0);
             purchaseItemsDTO.setStatus(0);
+
+            // Temporary set 0
+            purchaseOrderEntity.setTotalAmount(BigDecimal.valueOf(0));
             // Save purchase order
             purchaseOrderRepository.save(purchaseOrderEntity);
             // Save purchase details
+            BigDecimal totalAmount = BigDecimal.valueOf(0);
             purchaseItemsDTO.setPurchaseItems(new LinkedList<>());
             for (CreatePurchaseOrderDTO.PurchaseItem item:
                     createPurchaseOrderDTO.getPurchaseItems()) {
@@ -94,15 +101,23 @@ public class PurchaseOrderService {
 
                     purchaseDetail.setProductPrice(productOptional.get().getPrice());
                     purchaseDetailDTO.setProductPrice(productOptional.get().getPrice());
+
+                    totalAmount = totalAmount.add(productOptional.get().getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
                 } else {
                     purchaseManagementDTO.setSuccess(false);
                     purchaseManagementDTO.setMessage(ErrorMessage.PRODUCT_NOT_FOUND);
                     return purchaseManagementDTO;
                 }
                 // Save purchase detail
+                purchaseOrderEntity.setTotalAmount(totalAmount);
                 purchaseItemsDTO.getPurchaseItems().add(purchaseDetailDTO);
                 purchaseDetailRepository.save(purchaseDetail);
             }
+            // Update purchase order
+            purchaseItemsDTO.setTotalAmount(totalAmount);
+            purchaseOrderEntity.setTotalAmount(totalAmount);
+            purchaseOrderRepository.save(purchaseOrderEntity);
+
             purchaseManagementDTO.setSuccess(true);
             purchaseManagementDTO.setPurchaseDetail(purchaseItemsDTO);
         } else {

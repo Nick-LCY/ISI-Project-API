@@ -42,7 +42,7 @@ public class ProductService {
                 page);
     }
 
-    public ProductEntity findProduct(Integer id) {
+    public ProductDetailDTO findProduct(Integer id) {
         Optional<ProductEntity> productEntityOptional =productRepository.findById(id);
         ProductDetailDTO productDetailDTO = null;
         if (productEntityOptional.isPresent()) {

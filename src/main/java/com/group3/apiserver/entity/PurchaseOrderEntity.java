@@ -1,6 +1,7 @@
 package com.group3.apiserver.entity;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Objects;
 
@@ -14,6 +15,7 @@ public class PurchaseOrderEntity {
     private Integer cancelledBy;
     private int status;
     private int userId;
+    private BigDecimal totalAmount;
 
     @Id
     @Column(name = "id")
@@ -102,5 +104,15 @@ public class PurchaseOrderEntity {
     @Override
     public int hashCode() {
         return Objects.hash(id, purchaseDate, shipmentDate, cancelDate, cancelledBy, status, userId);
+    }
+
+    @Basic
+    @Column(name = "total_amount")
+    public BigDecimal getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
     }
 }

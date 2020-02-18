@@ -1,6 +1,7 @@
 package com.group3.apiserver.controller;
 
 import com.group3.apiserver.dto.PaginationDTO;
+import com.group3.apiserver.dto.ProductDetailDTO;
 import com.group3.apiserver.entity.ProductEntity;
 import com.group3.apiserver.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class ProductController {
     }
 
     @GetMapping("/product")
-    public ProductEntity getProduct(@RequestParam(name = "id") Integer id) {
+    public ProductDetailDTO getProduct(@RequestParam(name = "id") Integer id) {
         return productService.findProduct(id);
     }
 }
