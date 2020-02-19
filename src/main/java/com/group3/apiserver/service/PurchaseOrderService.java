@@ -2,10 +2,10 @@ package com.group3.apiserver.service;
 
 import com.group3.apiserver.dto.PaginationDTO;
 import com.group3.apiserver.dto.purchase.CreatePurchaseOrderDTO;
+import com.group3.apiserver.dto.purchase.PurchaseManagementDTO;
 import com.group3.apiserver.dto.purchase.PurchaseOrderDTO;
 import com.group3.apiserver.dto.purchase.items.PurchaseDetailDTO;
 import com.group3.apiserver.dto.purchase.items.PurchaseItemsDTO;
-import com.group3.apiserver.dto.purchase.PurchaseManagementDTO;
 import com.group3.apiserver.entity.ProductEntity;
 import com.group3.apiserver.entity.PurchaseDetailEntity;
 import com.group3.apiserver.entity.PurchaseOrderEntity;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Random;
@@ -71,10 +71,10 @@ public class PurchaseOrderService {
             purchaseItemsDTO.setPoNo(purchaseOrderId);
 
             purchaseOrderEntity.setUserId(createPurchaseOrderDTO.getUserId());
-            // fixme: Wrong time zone now
-            Date date = new Date();
-            purchaseOrderEntity.setPurchaseDate(date);
-            purchaseItemsDTO.setPurchaseDate(date);
+
+            double timestamp = System.currentTimeMillis();
+            purchaseOrderEntity.setPurchaseDate(BigDecimal.valueOf(System.currentTimeMillis()).toString());
+            purchaseItemsDTO.setPurchaseDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(timestamp));
 
             purchaseOrderEntity.setStatus(0);
             purchaseItemsDTO.setStatus(0);
@@ -163,9 +163,8 @@ public class PurchaseOrderService {
                         if (status == 1 || status == 2) {
                             if (authenticationUtil.vendorAuthentication(userId, token)) {
                                 purchaseOrder.setStatus(status);
-                                // fixme: still wrong timezone
                                 if (status == 2) {
-                                    purchaseOrder.setShipmentDate(new Date());
+                                    purchaseOrder.setShipmentDate(BigDecimal.valueOf(System.currentTimeMillis()).toString());
                                 }
                                 purchaseOrderRepository.save(purchaseOrder);
                                 purchaseManagementDTO.setSuccess(true);
@@ -178,8 +177,7 @@ public class PurchaseOrderService {
                             // 1 represents cancelled by vendor, 0 represents cancelled by user
                             purchaseOrder.setCancelledBy(
                                     authenticationUtil.vendorAuthentication(userId, token)?1:0);
-                            // fixme: still wrong timezone
-                            purchaseOrder.setCancelDate(new Date());
+                            purchaseOrder.setCancelDate(BigDecimal.valueOf(System.currentTimeMillis()).toString());
                             purchaseOrderRepository.save(purchaseOrder);
                             purchaseManagementDTO.setSuccess(true);
                         }
@@ -196,7 +194,6 @@ public class PurchaseOrderService {
         return purchaseManagementDTO;
     }
 
-    // TODO: To be finished
     public PurchaseManagementDTO getPurchaseOrders(Integer userId, String token, String statusKey, Integer page) {
         // Init needed DTOs
         PurchaseManagementDTO purchaseManagementDTO = new PurchaseManagementDTO();
@@ -226,7 +223,7 @@ public class PurchaseOrderService {
                     purchaseOrderPage.toList()) {
                 PurchaseOrderDTO purchaseOrderDTO = new PurchaseOrderDTO();
                 purchaseOrderDTO.setPoNo(purchaseOrder.getId());
-                purchaseOrderDTO.setPurchaseDate(purchaseOrder.getPurchaseDate());
+                purchaseOrderDTO.setPurchaseDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Double.valueOf(purchaseOrder.getPurchaseDate())));
                 purchaseOrderDTO.setStatus(statusList[purchaseOrder.getStatus()]);
                 purchaseOrderDTO.setTotalAmount(purchaseOrder.getTotalAmount());
                 paginationDTO.getItemList().add(purchaseOrderDTO);

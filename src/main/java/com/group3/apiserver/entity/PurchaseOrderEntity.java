@@ -2,16 +2,15 @@ package com.group3.apiserver.entity;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.Objects;
 
 @Entity
 @Table(name = "purchase_order", schema = "isi")
 public class PurchaseOrderEntity {
     private int id;
-    private Date purchaseDate;
-    private Date shipmentDate;
-    private Date cancelDate;
+    private String purchaseDate;
+    private String shipmentDate;
+    private String cancelDate;
     private Integer cancelledBy;
     private int status;
     private int userId;
@@ -29,31 +28,31 @@ public class PurchaseOrderEntity {
 
     @Basic
     @Column(name = "purchase_date")
-    public Date getPurchaseDate() {
+    public String getPurchaseDate() {
         return purchaseDate;
     }
 
-    public void setPurchaseDate(Date purchaseDate) {
+    public void setPurchaseDate(String purchaseDate) {
         this.purchaseDate = purchaseDate;
     }
 
     @Basic
     @Column(name = "shipment_date")
-    public Date getShipmentDate() {
+    public String getShipmentDate() {
         return shipmentDate;
     }
 
-    public void setShipmentDate(Date shipmentDate) {
+    public void setShipmentDate(String shipmentDate) {
         this.shipmentDate = shipmentDate;
     }
 
     @Basic
     @Column(name = "cancel_date")
-    public Date getCancelDate() {
+    public String getCancelDate() {
         return cancelDate;
     }
 
-    public void setCancelDate(Date cancelDate) {
+    public void setCancelDate(String cancelDate) {
         this.cancelDate = cancelDate;
     }
 

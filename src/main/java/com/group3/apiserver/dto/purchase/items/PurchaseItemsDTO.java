@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 
 @Data
@@ -14,9 +13,9 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class PurchaseItemsDTO {
     private Integer poNo;
-    private Date purchaseDate;
-    private Date shipmentDate;
-    private Date cancelDate;
+    private String purchaseDate;
+    private String shipmentDate;
+    private String cancelDate;
     private Integer cancelledBy;
     private Integer status;
     private BigDecimal totalAmount;
