@@ -30,9 +30,9 @@ public class PurchaseOrderController {
 
     @GetMapping("/purchase_orders")
     public PurchaseManagementDTO getPurchaseOrders(@RequestParam(name = "user_id") Integer userId,
-                                                   @RequestParam(name = "token") Integer token,
-                                                   @RequestParam(name = "status") Integer status,
+                                                   @RequestParam(name = "token") String token,
+                                                   @RequestParam(name = "status_key") String statusKey,
                                                    @RequestParam(name = "page") Integer page) {
-        return purchaseOrderService.getPurchaseOrders(userId, token, status, page);
+        return purchaseOrderService.getPurchaseOrders(userId, token, statusKey, page);
     }
 }

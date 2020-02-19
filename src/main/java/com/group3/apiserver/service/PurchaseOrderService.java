@@ -1,6 +1,8 @@
 package com.group3.apiserver.service;
 
+import com.group3.apiserver.dto.PaginationDTO;
 import com.group3.apiserver.dto.purchase.CreatePurchaseOrderDTO;
+import com.group3.apiserver.dto.purchase.PurchaseOrderDTO;
 import com.group3.apiserver.dto.purchase.items.PurchaseDetailDTO;
 import com.group3.apiserver.dto.purchase.items.PurchaseItemsDTO;
 import com.group3.apiserver.dto.purchase.PurchaseManagementDTO;
@@ -13,6 +15,9 @@ import com.group3.apiserver.repository.PurchaseDetailRepository;
 import com.group3.apiserver.repository.PurchaseOrderRepository;
 import com.group3.apiserver.util.AuthenticationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -192,7 +197,47 @@ public class PurchaseOrderService {
     }
 
     // TODO: To be finished
-    public PurchaseManagementDTO getPurchaseOrders(Integer userId, Integer token, Integer status, Integer page) {
-        return null;
+    public PurchaseManagementDTO getPurchaseOrders(Integer userId, String token, String statusKey, Integer page) {
+        // Init needed DTOs
+        PurchaseManagementDTO purchaseManagementDTO = new PurchaseManagementDTO();
+        PaginationDTO<PurchaseOrderDTO> paginationDTO = new PaginationDTO<>();
+        paginationDTO.setItemList(new LinkedList<>());
+        // User authentication
+        if (authenticationUtil.userAuthentication(userId, token)) {
+            // Select page from database by statusKey
+            Page<PurchaseOrderEntity> purchaseOrderPage;
+            Pageable pageable = PageRequest.of(page - 1, 10);
+            if (statusKey.equals("current")) {
+                purchaseOrderPage
+                        = purchaseOrderRepository.findAllByUserIdAndTwoStatus(userId, 0, 1, pageable);
+            } else if (statusKey.equals("past")) {
+                purchaseOrderPage
+                        = purchaseOrderRepository.findAllByUserIdAndTwoStatus(userId, 2, 3, pageable);
+            } else {
+                purchaseManagementDTO.setSuccess(false);
+                purchaseManagementDTO.setMessage(ErrorMessage.INVALID_STATUS);
+                return purchaseManagementDTO;
+            }
+            // Convert PurchaseOrder to PurchaseOrderDTO and construct paginationDTO
+            paginationDTO.setTotalPages(purchaseOrderPage.getTotalPages());
+            paginationDTO.setCurrentPage(page);
+            String[] statusList = {"hold", "pending", "shipped", "cancelled"};
+            for (PurchaseOrderEntity purchaseOrder :
+                    purchaseOrderPage.toList()) {
+                PurchaseOrderDTO purchaseOrderDTO = new PurchaseOrderDTO();
+                purchaseOrderDTO.setPoNo(purchaseOrder.getId());
+                purchaseOrderDTO.setPurchaseDate(purchaseOrder.getPurchaseDate());
+                purchaseOrderDTO.setStatus(statusList[purchaseOrder.getStatus()]);
+                purchaseOrderDTO.setTotalAmount(purchaseOrder.getTotalAmount());
+                paginationDTO.getItemList().add(purchaseOrderDTO);
+            }
+            // Construct purchaseManagementDTO
+            purchaseManagementDTO.setSuccess(true);
+            purchaseManagementDTO.setPoInfo(paginationDTO);
+        } else {
+            purchaseManagementDTO.setSuccess(false);
+            purchaseManagementDTO.setMessage(ErrorMessage.AUTHENTICATION_FAIL);
+        }
+        return purchaseManagementDTO;
     }
 }

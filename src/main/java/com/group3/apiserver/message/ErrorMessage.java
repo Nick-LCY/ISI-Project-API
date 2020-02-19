@@ -10,4 +10,5 @@ public class ErrorMessage {
     public static final String HAVE_NO_RIGHT = "Don't have right.";
     public static final String CANNOT_CHANGE_SHIPPED_AND_CANCELLED = "Cannot change status of cancelled or shipped purchase orders.";
     public static final String CANNOT_CHANGE_TO_TARGET_STATUS = "Cannot change to target status.";
+    public static final String INVALID_STATUS = "Cannot select this kind of status.";
 }
