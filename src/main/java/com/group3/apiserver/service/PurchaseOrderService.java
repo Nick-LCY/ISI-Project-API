@@ -24,6 +24,7 @@ import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
@@ -61,7 +62,7 @@ public class PurchaseOrderService {
         PurchaseManagementDTO purchaseManagementDTO = new PurchaseManagementDTO();
         if (authenticationUtil.userAuthentication(createPurchaseOrderDTO.getUserId(), createPurchaseOrderDTO.getToken())) {
             PurchaseItemsDTO purchaseItemsDTO = new PurchaseItemsDTO();
-            PurchaseOrderEntity purchaseOrderEntity = new PurchaseOrderEntity();
+            PurchaseOrderEntity purchaseOrder = new PurchaseOrderEntity();
             // Generate a unique PoNo
             Random random = new Random();
             int purchaseOrderId = random.nextInt(90000000) + 10000000;
@@ -69,22 +70,22 @@ public class PurchaseOrderService {
                 purchaseOrderId = random.nextInt(90000000) + 10000000;
             }
             // Purchase order's basic info
-            purchaseOrderEntity.setId(purchaseOrderId);
+            purchaseOrder.setId(purchaseOrderId);
             purchaseItemsDTO.setPoNo(purchaseOrderId);
 
-            purchaseOrderEntity.setUserId(createPurchaseOrderDTO.getUserId());
+            purchaseOrder.setUserId(createPurchaseOrderDTO.getUserId());
 
             double timestamp = System.currentTimeMillis();
-            purchaseOrderEntity.setPurchaseDate(BigDecimal.valueOf(System.currentTimeMillis()).toString());
+            purchaseOrder.setPurchaseDate(BigDecimal.valueOf(System.currentTimeMillis()).toString());
             purchaseItemsDTO.setPurchaseDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(timestamp));
 
-            purchaseOrderEntity.setStatus(0);
+            purchaseOrder.setStatus(0);
             purchaseItemsDTO.setStatus(statusList[0]);
 
             // Temporary set 0
-            purchaseOrderEntity.setTotalAmount(BigDecimal.valueOf(0));
+            purchaseOrder.setTotalAmount(BigDecimal.valueOf(0));
             // Save purchase order
-            purchaseOrderRepository.save(purchaseOrderEntity);
+            purchaseOrderRepository.save(purchaseOrder);
             // Save purchase details
             BigDecimal totalAmount = BigDecimal.valueOf(0);
             purchaseItemsDTO.setPurchaseItems(new LinkedList<>());
@@ -116,14 +117,14 @@ public class PurchaseOrderService {
                     return purchaseManagementDTO;
                 }
                 // Save purchase detail
-                purchaseOrderEntity.setTotalAmount(totalAmount);
+                purchaseOrder.setTotalAmount(totalAmount);
                 purchaseItemsDTO.getPurchaseItems().add(purchaseDetailDTO);
                 purchaseDetailRepository.save(purchaseDetail);
             }
             // Update purchase order
             purchaseItemsDTO.setTotalAmount(totalAmount);
-            purchaseOrderEntity.setTotalAmount(totalAmount);
-            purchaseOrderRepository.save(purchaseOrderEntity);
+            purchaseOrder.setTotalAmount(totalAmount);
+            purchaseOrderRepository.save(purchaseOrder);
 
             purchaseManagementDTO.setSuccess(true);
             purchaseManagementDTO.setPurchaseDetail(purchaseItemsDTO);
@@ -232,6 +233,61 @@ public class PurchaseOrderService {
             // Construct purchaseManagementDTO
             purchaseManagementDTO.setSuccess(true);
             purchaseManagementDTO.setPoInfo(paginationDTO);
+        } else {
+            purchaseManagementDTO.setSuccess(false);
+            purchaseManagementDTO.setMessage(ErrorMessage.AUTHENTICATION_FAIL);
+        }
+        return purchaseManagementDTO;
+    }
+
+    public PurchaseManagementDTO getPurchaseOrder(Integer userId, String token, Integer purchaseOrderId) {
+        PurchaseManagementDTO purchaseManagementDTO = new PurchaseManagementDTO();
+        // User authentication
+        if (authenticationUtil.userAuthentication(userId, token)) {
+            // Try to find the purchase order
+            Optional<PurchaseOrderEntity> purchaseOrderOptional = purchaseOrderRepository.findById(purchaseOrderId);
+            if (purchaseOrderOptional.isPresent()) {
+                PurchaseOrderEntity purchaseOrder = purchaseOrderOptional.get();
+                if (purchaseOrder.getUserId() != userId) {
+                    purchaseManagementDTO.setSuccess(false);
+                    purchaseManagementDTO.setMessage(ErrorMessage.HAVE_NO_RIGHT);
+                    return purchaseManagementDTO;
+                }
+                List<PurchaseDetailEntity> purchaseDetails = purchaseDetailRepository.findAllByPurchaseOrderId(purchaseOrderId);
+                PurchaseItemsDTO purchaseItemsDTO = new PurchaseItemsDTO();
+                // Basic purchase order information
+                purchaseItemsDTO.setPoNo(purchaseOrderId);
+                if (purchaseOrder.getPurchaseDate() != null && !purchaseOrder.getPurchaseDate().isEmpty()) {
+                    purchaseItemsDTO.setPurchaseDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Double.valueOf(purchaseOrder.getPurchaseDate())));
+                }
+                if (purchaseOrder.getShipmentDate() != null && !purchaseOrder.getShipmentDate().isEmpty()) {
+                    purchaseItemsDTO.setShipmentDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Double.valueOf(purchaseOrder.getShipmentDate())));
+                }
+                if (purchaseOrder.getCancelDate() != null && !purchaseOrder.getCancelDate().isEmpty()) {
+                    purchaseItemsDTO.setCancelDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Double.valueOf(purchaseOrder.getCancelDate())));
+                }
+                purchaseItemsDTO.setCancelledBy(purchaseOrder.getCancelledBy());
+                purchaseItemsDTO.setStatus(statusList[purchaseOrder.getStatus()]);
+                purchaseItemsDTO.setTotalAmount(purchaseOrder.getTotalAmount());
+                // Purchase order detail information
+                purchaseItemsDTO.setPurchaseItems(new LinkedList<>());
+                for (PurchaseDetailEntity purchaseDetail :
+                        purchaseDetails) {
+                    PurchaseDetailDTO purchaseDetailDTO = new PurchaseDetailDTO();
+                    purchaseDetailDTO.setProductId(purchaseDetail.getProductId());
+                    purchaseDetailDTO.setProductName(purchaseDetail.getProductName());
+                    purchaseDetailDTO.setProductPrice(purchaseDetail.getProductPrice());
+                    purchaseDetailDTO.setQuantity(purchaseDetail.getQuantity());
+                    purchaseItemsDTO.getPurchaseItems().add(purchaseDetailDTO);
+                }
+
+                purchaseManagementDTO.setSuccess(true);
+                purchaseManagementDTO.setPurchaseDetail(purchaseItemsDTO);
+            } else {
+                purchaseManagementDTO.setSuccess(false);
+                purchaseManagementDTO.setMessage(ErrorMessage.PURCHASE_ORDER_NOT_FOUND);
+                return purchaseManagementDTO;
+            }
         } else {
             purchaseManagementDTO.setSuccess(false);
             purchaseManagementDTO.setMessage(ErrorMessage.AUTHENTICATION_FAIL);
