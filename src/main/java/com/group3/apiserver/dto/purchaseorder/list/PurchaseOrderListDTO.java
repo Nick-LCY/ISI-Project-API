@@ -1,4 +1,4 @@
-package com.group3.apiserver.dto.purchase;
+package com.group3.apiserver.dto.purchaseorder.list;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class PurchaseOrderDTO {
+public class PurchaseOrderListDTO {
     private Integer PoNo;
     private String purchaseDate;
     private String status;

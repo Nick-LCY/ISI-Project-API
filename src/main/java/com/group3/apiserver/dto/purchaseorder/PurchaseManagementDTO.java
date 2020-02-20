@@ -1,10 +1,12 @@
-package com.group3.apiserver.dto.purchase;
+package com.group3.apiserver.dto.purchaseorder;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.group3.apiserver.dto.PaginationDTO;
-import com.group3.apiserver.dto.purchase.items.PurchaseItemsDTO;
+import com.group3.apiserver.dto.purchaseorder.detail.PurchaseOrderDTO;
+import com.group3.apiserver.dto.purchaseorder.list.PurchaseOrderListDTO;
 import lombok.Data;
 
 @Data
@@ -13,6 +15,7 @@ import lombok.Data;
 public class PurchaseManagementDTO {
     private boolean success;
     private String message;
-    private PaginationDTO<PurchaseOrderDTO> PoInfo;
-    private PurchaseItemsDTO purchaseDetail;
+    @JsonProperty("po_info")
+    private PaginationDTO<PurchaseOrderListDTO> purchaseOrdersPagination;
+    private PurchaseOrderDTO purchaseDetail;
 }

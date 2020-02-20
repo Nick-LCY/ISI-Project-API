@@ -1,4 +1,4 @@
-package com.group3.apiserver.dto.purchase.items;
+package com.group3.apiserver.dto.purchaseorder.detail;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class PurchaseItemsDTO {
+public class PurchaseOrderDTO {
     private Integer poNo;
     private String purchaseDate;
     private String shipmentDate;

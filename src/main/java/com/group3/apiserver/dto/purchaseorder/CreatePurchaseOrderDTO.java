@@ -1,4 +1,4 @@
-package com.group3.apiserver.dto.purchase;
+package com.group3.apiserver.dto.purchaseorder;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

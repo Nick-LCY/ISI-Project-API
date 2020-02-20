@@ -1,11 +1,11 @@
 package com.group3.apiserver.service;
 
 import com.group3.apiserver.dto.PaginationDTO;
-import com.group3.apiserver.dto.purchase.CreatePurchaseOrderDTO;
-import com.group3.apiserver.dto.purchase.PurchaseManagementDTO;
-import com.group3.apiserver.dto.purchase.PurchaseOrderDTO;
-import com.group3.apiserver.dto.purchase.items.PurchaseDetailDTO;
-import com.group3.apiserver.dto.purchase.items.PurchaseItemsDTO;
+import com.group3.apiserver.dto.purchaseorder.CreatePurchaseOrderDTO;
+import com.group3.apiserver.dto.purchaseorder.PurchaseManagementDTO;
+import com.group3.apiserver.dto.purchaseorder.list.PurchaseOrderListDTO;
+import com.group3.apiserver.dto.purchaseorder.detail.PurchaseDetailDTO;
+import com.group3.apiserver.dto.purchaseorder.detail.PurchaseOrderDTO;
 import com.group3.apiserver.entity.ProductEntity;
 import com.group3.apiserver.entity.PurchaseDetailEntity;
 import com.group3.apiserver.entity.PurchaseOrderEntity;
@@ -61,7 +61,7 @@ public class PurchaseOrderService {
     public PurchaseManagementDTO createPurchaseOrder(CreatePurchaseOrderDTO createPurchaseOrderDTO) {
         PurchaseManagementDTO purchaseManagementDTO = new PurchaseManagementDTO();
         if (authenticationUtil.userAuthentication(createPurchaseOrderDTO.getUserId(), createPurchaseOrderDTO.getToken())) {
-            PurchaseItemsDTO purchaseItemsDTO = new PurchaseItemsDTO();
+            PurchaseOrderDTO purchaseOrderDTO = new PurchaseOrderDTO();
             PurchaseOrderEntity purchaseOrder = new PurchaseOrderEntity();
             // Generate a unique PoNo
             Random random = new Random();
@@ -71,16 +71,16 @@ public class PurchaseOrderService {
             }
             // Purchase order's basic info
             purchaseOrder.setId(purchaseOrderId);
-            purchaseItemsDTO.setPoNo(purchaseOrderId);
+            purchaseOrderDTO.setPoNo(purchaseOrderId);
 
             purchaseOrder.setUserId(createPurchaseOrderDTO.getUserId());
 
             double timestamp = System.currentTimeMillis();
             purchaseOrder.setPurchaseDate(BigDecimal.valueOf(System.currentTimeMillis()).toString());
-            purchaseItemsDTO.setPurchaseDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(timestamp));
+            purchaseOrderDTO.setPurchaseDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(timestamp));
 
             purchaseOrder.setStatus(0);
-            purchaseItemsDTO.setStatus(statusList[0]);
+            purchaseOrderDTO.setStatus(statusList[0]);
 
             // Temporary set 0
             purchaseOrder.setTotalAmount(BigDecimal.valueOf(0));
@@ -88,7 +88,7 @@ public class PurchaseOrderService {
             purchaseOrderRepository.save(purchaseOrder);
             // Save purchase details
             BigDecimal totalAmount = BigDecimal.valueOf(0);
-            purchaseItemsDTO.setPurchaseItems(new LinkedList<>());
+            purchaseOrderDTO.setPurchaseItems(new LinkedList<>());
             for (CreatePurchaseOrderDTO.PurchaseItem item:
                     createPurchaseOrderDTO.getPurchaseItems()) {
                 PurchaseDetailEntity purchaseDetail = new PurchaseDetailEntity();
@@ -118,16 +118,16 @@ public class PurchaseOrderService {
                 }
                 // Save purchase detail
                 purchaseOrder.setTotalAmount(totalAmount);
-                purchaseItemsDTO.getPurchaseItems().add(purchaseDetailDTO);
+                purchaseOrderDTO.getPurchaseItems().add(purchaseDetailDTO);
                 purchaseDetailRepository.save(purchaseDetail);
             }
             // Update purchase order
-            purchaseItemsDTO.setTotalAmount(totalAmount);
+            purchaseOrderDTO.setTotalAmount(totalAmount);
             purchaseOrder.setTotalAmount(totalAmount);
             purchaseOrderRepository.save(purchaseOrder);
 
             purchaseManagementDTO.setSuccess(true);
-            purchaseManagementDTO.setPurchaseDetail(purchaseItemsDTO);
+            purchaseManagementDTO.setPurchaseDetail(purchaseOrderDTO);
         } else {
             purchaseManagementDTO.setSuccess(false);
             purchaseManagementDTO.setMessage(ErrorMessage.AUTHENTICATION_FAIL);
@@ -200,7 +200,7 @@ public class PurchaseOrderService {
     public PurchaseManagementDTO getPurchaseOrders(Integer userId, String token, String statusKey, Integer page) {
         // Init needed DTOs
         PurchaseManagementDTO purchaseManagementDTO = new PurchaseManagementDTO();
-        PaginationDTO<PurchaseOrderDTO> paginationDTO = new PaginationDTO<>();
+        PaginationDTO<PurchaseOrderListDTO> paginationDTO = new PaginationDTO<>();
         paginationDTO.setItemList(new LinkedList<>());
         // User authentication
         if (authenticationUtil.userAuthentication(userId, token)) {
@@ -223,16 +223,16 @@ public class PurchaseOrderService {
             paginationDTO.setCurrentPage(page);
             for (PurchaseOrderEntity purchaseOrder :
                     purchaseOrderPage.toList()) {
-                PurchaseOrderDTO purchaseOrderDTO = new PurchaseOrderDTO();
-                purchaseOrderDTO.setPoNo(purchaseOrder.getId());
-                purchaseOrderDTO.setPurchaseDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Double.valueOf(purchaseOrder.getPurchaseDate())));
-                purchaseOrderDTO.setStatus(statusList[purchaseOrder.getStatus()]);
-                purchaseOrderDTO.setTotalAmount(purchaseOrder.getTotalAmount());
-                paginationDTO.getItemList().add(purchaseOrderDTO);
+                PurchaseOrderListDTO purchaseOrderListDTO = new PurchaseOrderListDTO();
+                purchaseOrderListDTO.setPoNo(purchaseOrder.getId());
+                purchaseOrderListDTO.setPurchaseDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Double.valueOf(purchaseOrder.getPurchaseDate())));
+                purchaseOrderListDTO.setStatus(statusList[purchaseOrder.getStatus()]);
+                purchaseOrderListDTO.setTotalAmount(purchaseOrder.getTotalAmount());
+                paginationDTO.getItemList().add(purchaseOrderListDTO);
             }
             // Construct purchaseManagementDTO
             purchaseManagementDTO.setSuccess(true);
-            purchaseManagementDTO.setPoInfo(paginationDTO);
+            purchaseManagementDTO.setPurchaseOrdersPagination(paginationDTO);
         } else {
             purchaseManagementDTO.setSuccess(false);
             purchaseManagementDTO.setMessage(ErrorMessage.AUTHENTICATION_FAIL);
@@ -254,23 +254,23 @@ public class PurchaseOrderService {
                     return purchaseManagementDTO;
                 }
                 List<PurchaseDetailEntity> purchaseDetails = purchaseDetailRepository.findAllByPurchaseOrderId(purchaseOrderId);
-                PurchaseItemsDTO purchaseItemsDTO = new PurchaseItemsDTO();
+                PurchaseOrderDTO purchaseOrderDTO = new PurchaseOrderDTO();
                 // Basic purchase order information
-                purchaseItemsDTO.setPoNo(purchaseOrderId);
+                purchaseOrderDTO.setPoNo(purchaseOrderId);
                 if (purchaseOrder.getPurchaseDate() != null && !purchaseOrder.getPurchaseDate().isEmpty()) {
-                    purchaseItemsDTO.setPurchaseDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Double.valueOf(purchaseOrder.getPurchaseDate())));
+                    purchaseOrderDTO.setPurchaseDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Double.valueOf(purchaseOrder.getPurchaseDate())));
                 }
                 if (purchaseOrder.getShipmentDate() != null && !purchaseOrder.getShipmentDate().isEmpty()) {
-                    purchaseItemsDTO.setShipmentDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Double.valueOf(purchaseOrder.getShipmentDate())));
+                    purchaseOrderDTO.setShipmentDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Double.valueOf(purchaseOrder.getShipmentDate())));
                 }
                 if (purchaseOrder.getCancelDate() != null && !purchaseOrder.getCancelDate().isEmpty()) {
-                    purchaseItemsDTO.setCancelDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Double.valueOf(purchaseOrder.getCancelDate())));
+                    purchaseOrderDTO.setCancelDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Double.valueOf(purchaseOrder.getCancelDate())));
                 }
-                purchaseItemsDTO.setCancelledBy(purchaseOrder.getCancelledBy());
-                purchaseItemsDTO.setStatus(statusList[purchaseOrder.getStatus()]);
-                purchaseItemsDTO.setTotalAmount(purchaseOrder.getTotalAmount());
+                purchaseOrderDTO.setCancelledBy(purchaseOrder.getCancelledBy());
+                purchaseOrderDTO.setStatus(statusList[purchaseOrder.getStatus()]);
+                purchaseOrderDTO.setTotalAmount(purchaseOrder.getTotalAmount());
                 // Purchase order detail information
-                purchaseItemsDTO.setPurchaseItems(new LinkedList<>());
+                purchaseOrderDTO.setPurchaseItems(new LinkedList<>());
                 for (PurchaseDetailEntity purchaseDetail :
                         purchaseDetails) {
                     PurchaseDetailDTO purchaseDetailDTO = new PurchaseDetailDTO();
@@ -278,11 +278,11 @@ public class PurchaseOrderService {
                     purchaseDetailDTO.setProductName(purchaseDetail.getProductName());
                     purchaseDetailDTO.setProductPrice(purchaseDetail.getProductPrice());
                     purchaseDetailDTO.setQuantity(purchaseDetail.getQuantity());
-                    purchaseItemsDTO.getPurchaseItems().add(purchaseDetailDTO);
+                    purchaseOrderDTO.getPurchaseItems().add(purchaseDetailDTO);
                 }
 
                 purchaseManagementDTO.setSuccess(true);
-                purchaseManagementDTO.setPurchaseDetail(purchaseItemsDTO);
+                purchaseManagementDTO.setPurchaseDetail(purchaseOrderDTO);
             } else {
                 purchaseManagementDTO.setSuccess(false);
                 purchaseManagementDTO.setMessage(ErrorMessage.PURCHASE_ORDER_NOT_FOUND);
