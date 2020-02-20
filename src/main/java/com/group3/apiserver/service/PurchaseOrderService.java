@@ -71,7 +71,7 @@ public class PurchaseOrderService {
             }
             // Purchase order's basic info
             purchaseOrder.setId(purchaseOrderId);
-            purchaseOrderDTO.setPoNo(purchaseOrderId);
+            purchaseOrderDTO.setPurchaseOrderId(purchaseOrderId);
 
             purchaseOrder.setUserId(createPurchaseOrderDTO.getUserId());
 
@@ -80,7 +80,7 @@ public class PurchaseOrderService {
             purchaseOrderDTO.setPurchaseDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(timestamp));
 
             purchaseOrder.setStatus(0);
-            purchaseOrderDTO.setStatus(statusList[0]);
+            purchaseOrderDTO.setStatusInString(statusList[0]);
 
             // Temporary set 0
             purchaseOrder.setTotalAmount(BigDecimal.valueOf(0));
@@ -224,9 +224,9 @@ public class PurchaseOrderService {
             for (PurchaseOrderEntity purchaseOrder :
                     purchaseOrderPage.toList()) {
                 PurchaseOrderListDTO purchaseOrderListDTO = new PurchaseOrderListDTO();
-                purchaseOrderListDTO.setPoNo(purchaseOrder.getId());
+                purchaseOrderListDTO.setPurchaseOrderId(purchaseOrder.getId());
                 purchaseOrderListDTO.setPurchaseDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Double.valueOf(purchaseOrder.getPurchaseDate())));
-                purchaseOrderListDTO.setStatus(statusList[purchaseOrder.getStatus()]);
+                purchaseOrderListDTO.setStatusInString(statusList[purchaseOrder.getStatus()]);
                 purchaseOrderListDTO.setTotalAmount(purchaseOrder.getTotalAmount());
                 paginationDTO.getItemList().add(purchaseOrderListDTO);
             }
@@ -256,7 +256,7 @@ public class PurchaseOrderService {
                 List<PurchaseDetailEntity> purchaseDetails = purchaseDetailRepository.findAllByPurchaseOrderId(purchaseOrderId);
                 PurchaseOrderDTO purchaseOrderDTO = new PurchaseOrderDTO();
                 // Basic purchase order information
-                purchaseOrderDTO.setPoNo(purchaseOrderId);
+                purchaseOrderDTO.setPurchaseOrderId(purchaseOrderId);
                 if (purchaseOrder.getPurchaseDate() != null && !purchaseOrder.getPurchaseDate().isEmpty()) {
                     purchaseOrderDTO.setPurchaseDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Double.valueOf(purchaseOrder.getPurchaseDate())));
                 }
@@ -267,7 +267,7 @@ public class PurchaseOrderService {
                     purchaseOrderDTO.setCancelDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Double.valueOf(purchaseOrder.getCancelDate())));
                 }
                 purchaseOrderDTO.setCancelledBy(purchaseOrder.getCancelledBy());
-                purchaseOrderDTO.setStatus(statusList[purchaseOrder.getStatus()]);
+                purchaseOrderDTO.setStatusInString(statusList[purchaseOrder.getStatus()]);
                 purchaseOrderDTO.setTotalAmount(purchaseOrder.getTotalAmount());
                 // Purchase order detail information
                 purchaseOrderDTO.setPurchaseItems(new LinkedList<>());

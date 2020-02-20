@@ -17,9 +17,5 @@ public class CreatePurchaseOrderDTO {
     public static class PurchaseItem {
         private Integer productId;
         private Integer quantity;
-        public PurchaseItem(Integer productId, Integer quantity) {
-            this.productId = productId;
-            this.quantity = quantity;
-        }
     }
 }
