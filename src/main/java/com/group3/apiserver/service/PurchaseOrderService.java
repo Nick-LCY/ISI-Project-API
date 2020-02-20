@@ -29,6 +29,8 @@ import java.util.Random;
 
 @Service
 public class PurchaseOrderService {
+    private final String[] statusList = {"hold", "pending", "shipped", "cancelled"};
+
     private AuthenticationUtil authenticationUtil;
     private PurchaseDetailRepository purchaseDetailRepository;
     private ProductRepository productRepository;
@@ -77,7 +79,7 @@ public class PurchaseOrderService {
             purchaseItemsDTO.setPurchaseDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(timestamp));
 
             purchaseOrderEntity.setStatus(0);
-            purchaseItemsDTO.setStatus(0);
+            purchaseItemsDTO.setStatus(statusList[0]);
 
             // Temporary set 0
             purchaseOrderEntity.setTotalAmount(BigDecimal.valueOf(0));
@@ -218,7 +220,6 @@ public class PurchaseOrderService {
             // Convert PurchaseOrder to PurchaseOrderDTO and construct paginationDTO
             paginationDTO.setTotalPages(purchaseOrderPage.getTotalPages());
             paginationDTO.setCurrentPage(page);
-            String[] statusList = {"hold", "pending", "shipped", "cancelled"};
             for (PurchaseOrderEntity purchaseOrder :
                     purchaseOrderPage.toList()) {
                 PurchaseOrderDTO purchaseOrderDTO = new PurchaseOrderDTO();

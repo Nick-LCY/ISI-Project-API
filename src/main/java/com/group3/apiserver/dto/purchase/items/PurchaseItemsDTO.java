@@ -17,7 +17,7 @@ public class PurchaseItemsDTO {
     private String shipmentDate;
     private String cancelDate;
     private Integer cancelledBy;
-    private Integer status;
+    private String status;
     private BigDecimal totalAmount;
     private List<PurchaseDetailDTO> purchaseItems;
 }
