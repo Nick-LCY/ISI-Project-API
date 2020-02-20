@@ -29,7 +29,7 @@ import java.util.Random;
 
 @Service
 public class PurchaseOrderService {
-    private final String[] statusList = {"hold", "pending", "shipped", "cancelled"};
+    private final String[] statusList = {"pending", "hold", "shipped", "cancelled"};
 
     private AuthenticationUtil authenticationUtil;
     private PurchaseDetailRepository purchaseDetailRepository;
