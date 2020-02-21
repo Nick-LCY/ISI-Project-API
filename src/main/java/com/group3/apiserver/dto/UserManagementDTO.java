@@ -8,6 +8,7 @@ import lombok.Data;
 public class UserManagementDTO {
     private boolean success;
     private Integer id;
+    private String name;
     private String token;
     private String message;
 }

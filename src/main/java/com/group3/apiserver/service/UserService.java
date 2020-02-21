@@ -71,7 +71,10 @@ public class UserService {
                 userRepository.save(user);
                 // Get auto generated id from database and set to DTO
                 Optional<UserEntity> userOptional = userRepository.findByEmail(user.getEmail());
-                userOptional.ifPresent(userEntity -> creatUserDTO.setId(userEntity.getId()));
+                userOptional.ifPresent(u -> {
+                    creatUserDTO.setId(u.getId());
+                    creatUserDTO.setName(u.getName());
+                });
             } else {
                 creatUserDTO.setSuccess(false);
                 creatUserDTO.setMessage(ErrorMessage.EMAIL_VALIDATION_FAIL);
@@ -93,6 +96,7 @@ public class UserService {
                 loginDTO.setToken(setTokenAndCreateTime(user));
                 user = userRepository.save(user);
                 loginDTO.setId(user.getId());
+                loginDTO.setName(user.getName());
             } else {
                 loginDTO.setSuccess(false);
             }
