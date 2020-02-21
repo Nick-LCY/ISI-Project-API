@@ -15,6 +15,8 @@ import java.util.List;
 public class PurchaseOrderDTO {
     @JsonProperty("po_no")
     private Integer purchaseOrderId;
+    private String customerName;
+    private String shippingAddress;
     private String purchaseDate;
     private String shipmentDate;
     private String cancelDate;

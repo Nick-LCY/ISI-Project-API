@@ -9,10 +9,12 @@ import com.group3.apiserver.dto.purchaseorder.detail.PurchaseOrderDTO;
 import com.group3.apiserver.entity.ProductEntity;
 import com.group3.apiserver.entity.PurchaseDetailEntity;
 import com.group3.apiserver.entity.PurchaseOrderEntity;
+import com.group3.apiserver.entity.UserEntity;
 import com.group3.apiserver.message.ErrorMessage;
 import com.group3.apiserver.repository.ProductRepository;
 import com.group3.apiserver.repository.PurchaseDetailRepository;
 import com.group3.apiserver.repository.PurchaseOrderRepository;
+import com.group3.apiserver.repository.UserRepository;
 import com.group3.apiserver.util.AuthenticationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -36,6 +38,7 @@ public class PurchaseOrderService {
     private PurchaseDetailRepository purchaseDetailRepository;
     private ProductRepository productRepository;
     private PurchaseOrderRepository purchaseOrderRepository;
+    private UserRepository userRepository;
 
     @Autowired
     public void setAuthenticationUtil(AuthenticationUtil authenticationUtil) {
@@ -55,6 +58,11 @@ public class PurchaseOrderService {
     @Autowired
     public void setPurchaseOrderRepository(PurchaseOrderRepository purchaseOrderRepository) {
         this.purchaseOrderRepository = purchaseOrderRepository;
+    }
+
+    @Autowired
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Transactional
@@ -246,6 +254,8 @@ public class PurchaseOrderService {
         if (authenticationUtil.userAuthentication(userId, token)) {
             // Try to find the purchase order
             Optional<PurchaseOrderEntity> purchaseOrderOptional = purchaseOrderRepository.findById(purchaseOrderId);
+            Optional<UserEntity> userOptional = userRepository.findById(userId);
+            UserEntity user = userOptional.orElse(new UserEntity());
             if (purchaseOrderOptional.isPresent()) {
                 PurchaseOrderEntity purchaseOrder = purchaseOrderOptional.get();
                 if (purchaseOrder.getUserId() != userId) {
@@ -269,6 +279,8 @@ public class PurchaseOrderService {
                 purchaseOrderDTO.setCancelledBy(purchaseOrder.getCancelledBy());
                 purchaseOrderDTO.setStatusInString(statusList[purchaseOrder.getStatus()]);
                 purchaseOrderDTO.setTotalAmount(purchaseOrder.getTotalAmount());
+                purchaseOrderDTO.setCustomerName(user.getName());
+                purchaseOrderDTO.setShippingAddress(user.getShippingAddr());
                 // Purchase order detail information
                 purchaseOrderDTO.setPurchaseItems(new LinkedList<>());
                 for (PurchaseDetailEntity purchaseDetail :
