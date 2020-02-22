@@ -1,5 +1,6 @@
 package com.group3.apiserver.controller;
 
+import com.group3.apiserver.dto.ReviewManagementDTO;
 import com.group3.apiserver.dto.ShoppingCartManagementDTO;
 import com.group3.apiserver.dto.UserManagementDTO;
 import com.group3.apiserver.service.UserService;
@@ -61,5 +62,14 @@ public class UserController {
                                                             @RequestParam(name = "product_id") Integer productId,
                                                             @RequestParam(name = "token") String token) {
         return userService.deleteShoppingCartItem(userId, productId, token);
+    }
+
+    @PostMapping("/review")
+    public ReviewManagementDTO saveUserReview(@RequestParam(name = "po_no") Integer purchaseOrderId,
+                                              @RequestParam(name = "product_id") Integer productId,
+                                              @RequestParam(name = "token") String token,
+                                              @RequestParam(name = "rating", defaultValue = "5") Integer rating,
+                                              @RequestParam(name = "content") String content) {
+        return userService.saveUserReview(purchaseOrderId, productId, token, rating, content);
     }
 }

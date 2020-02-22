@@ -10,7 +10,7 @@ public class ReviewEntity {
     private int productId;
     private int purchaseOrderId;
     private int stars;
-    private String review;
+    private String content;
 
     @Id
     @Column(name = "product_id")
@@ -43,13 +43,13 @@ public class ReviewEntity {
     }
 
     @Basic
-    @Column(name = "review")
-    public String getReview() {
-        return review;
+    @Column(name = "content")
+    public String getContent() {
+        return content;
     }
 
-    public void setReview(String review) {
-        this.review = review;
+    public void setContent(String review) {
+        this.content = review;
     }
 
     @Override
@@ -60,11 +60,11 @@ public class ReviewEntity {
         return productId == that.productId &&
                 purchaseOrderId == that.purchaseOrderId &&
                 stars == that.stars &&
-                Objects.equals(review, that.review);
+                Objects.equals(content, that.content);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(productId, purchaseOrderId, stars, review);
+        return Objects.hash(productId, purchaseOrderId, stars, content);
     }
 }

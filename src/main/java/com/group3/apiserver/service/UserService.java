@@ -1,15 +1,11 @@
 package com.group3.apiserver.service;
 
+import com.group3.apiserver.dto.ReviewManagementDTO;
 import com.group3.apiserver.dto.ShoppingCartManagementDTO;
 import com.group3.apiserver.dto.UserManagementDTO;
-import com.group3.apiserver.entity.ProductEntity;
-import com.group3.apiserver.entity.ShoppingCartItemEntity;
-import com.group3.apiserver.entity.ShoppingCartItemEntityPK;
-import com.group3.apiserver.entity.UserEntity;
+import com.group3.apiserver.entity.*;
 import com.group3.apiserver.message.ErrorMessage;
-import com.group3.apiserver.repository.ProductRepository;
-import com.group3.apiserver.repository.ShoppingCartItemRepository;
-import com.group3.apiserver.repository.UserRepository;
+import com.group3.apiserver.repository.*;
 import com.group3.apiserver.util.AuthenticationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +21,9 @@ public class UserService {
     private ShoppingCartItemRepository shoppingCartItemRepository;
     private ProductRepository productRepository;
     private AuthenticationUtil authenticationUtil;
+    private PurchaseDetailRepository purchaseDetailRepository;
+    private PurchaseOrderRepository purchaseOrderRepository;
+    private ReviewRepository reviewRepository;
 
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
@@ -44,6 +43,21 @@ public class UserService {
     @Autowired
     public void setAuthenticationUtil(AuthenticationUtil authenticationUtil) {
         this.authenticationUtil = authenticationUtil;
+    }
+
+    @Autowired
+    public void setPurchaseDetailRepository(PurchaseDetailRepository purchaseDetailRepository) {
+        this.purchaseDetailRepository = purchaseDetailRepository;
+    }
+
+    @Autowired
+    public void setPurchaseOrderRepository(PurchaseOrderRepository purchaseOrderRepository) {
+        this.purchaseOrderRepository = purchaseOrderRepository;
+    }
+
+    @Autowired
+    public void setReviewRepository(ReviewRepository reviewRepository) {
+        this.reviewRepository = reviewRepository;
     }
 
     public UserManagementDTO creatUser(String email, String pwd, String name, String shippingAddr) {
@@ -224,5 +238,53 @@ public class UserService {
             shoppingCartManagementDTO.setMessage(ErrorMessage.AUTHENTICATION_FAIL);
         }
         return shoppingCartManagementDTO;
+    }
+
+    public ReviewManagementDTO saveUserReview(Integer purchaseOrderId, Integer productId, String token, Integer rating, String content) {
+        ReviewManagementDTO reviewManagementDTO = new ReviewManagementDTO();
+        // Try to find target purchase order
+        Optional<PurchaseOrderEntity> purchaseOrderOptional = purchaseOrderRepository.findById(purchaseOrderId);
+        if (purchaseOrderOptional.isPresent()) {
+            // Check if purchase order's status is "shipped"
+            if (purchaseOrderOptional.get().getStatus() == 3) {
+                Optional<UserEntity> userOptional = userRepository.findById(purchaseOrderOptional.get().getUserId());
+                userOptional.ifPresent(user -> {
+                    // User authentication
+                    if (authenticationUtil.userAuthentication(user.getId(), token)) {
+                        PurchaseDetailEntityPK purchaseDetailPK = new PurchaseDetailEntityPK();
+                        purchaseDetailPK.setPurchaseOrderId(purchaseOrderId);
+                        purchaseDetailPK.setProductId(productId);
+                        Optional<PurchaseDetailEntity> purchaseDetailOptional
+                                = purchaseDetailRepository.findById(purchaseDetailPK);
+                        // Try to find target purchase detail
+                        if (purchaseDetailOptional.isPresent()) {
+                            // Generate review
+                            ReviewEntity review = new ReviewEntity();
+                            review.setPurchaseOrderId(purchaseOrderId);
+                            review.setProductId(productId);
+                            review.setStars(Math.min(Math.abs(rating), 5));
+                            review.setContent(content);
+                            reviewRepository.save(review);
+                            // Save review
+                            reviewManagementDTO.setSuccess(true);
+                            reviewManagementDTO.setProductId(productId);
+                        } else {
+                            reviewManagementDTO.setSuccess(false);
+                            reviewManagementDTO.setMessage(ErrorMessage.NO_SUCH_PRODUCT_FOUND_IN_THIS_PURCHASE_ORDER);
+                        }
+                    } else {
+                        reviewManagementDTO.setSuccess(false);
+                        reviewManagementDTO.setMessage(ErrorMessage.AUTHENTICATION_FAIL);
+                    }
+                });
+            } else {
+                reviewManagementDTO.setSuccess(false);
+                reviewManagementDTO.setMessage(ErrorMessage.CANNOT_COMMENT_UNSHIPPED_PRODUCT);
+            }
+        } else {
+            reviewManagementDTO.setSuccess(false);
+            reviewManagementDTO.setMessage(ErrorMessage.PURCHASE_ORDER_NOT_FOUND);
+        }
+        return reviewManagementDTO;
     }
 }

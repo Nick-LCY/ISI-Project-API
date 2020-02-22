@@ -11,4 +11,6 @@ public class ErrorMessage {
     public static final String CANNOT_CHANGE_SHIPPED_AND_CANCELLED = "Cannot change status of cancelled or shipped purchase orders.";
     public static final String CANNOT_CHANGE_TO_TARGET_STATUS = "Cannot change to target status.";
     public static final String INVALID_STATUS = "Cannot select this kind of status.";
+    public static final String CANNOT_COMMENT_UNSHIPPED_PRODUCT = "Cannot comment an unshipped product.";
+    public static final String NO_SUCH_PRODUCT_FOUND_IN_THIS_PURCHASE_ORDER = "No such product found in this purchase order.";
 }
