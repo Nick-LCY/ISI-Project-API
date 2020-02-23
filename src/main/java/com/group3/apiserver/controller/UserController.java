@@ -66,9 +66,9 @@ public class UserController {
     public ReviewManagementDTO saveUserReview(@RequestParam(name = "po_no") Integer purchaseOrderId,
                                               @RequestParam(name = "product_id") Integer productId,
                                               @RequestParam(name = "token") String token,
-                                              @RequestParam(name = "rating", defaultValue = "5") Integer rating,
+                                              @RequestParam(name = "star", defaultValue = "5") Integer stars,
                                               @RequestParam(name = "content") String content) {
-        return userService.saveUserReview(purchaseOrderId, productId, token, rating, content);
+        return userService.saveUserReview(purchaseOrderId, productId, token, stars, content);
     }
 
     @GetMapping("/reviews")

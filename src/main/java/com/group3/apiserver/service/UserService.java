@@ -241,7 +241,7 @@ public class UserService {
         return shoppingCartManagementDTO;
     }
 
-    public ReviewManagementDTO saveUserReview(Integer purchaseOrderId, Integer productId, String token, Integer rating, String content) {
+    public ReviewManagementDTO saveUserReview(Integer purchaseOrderId, Integer productId, String token, Integer stars, String content) {
         ReviewManagementDTO reviewManagementDTO = new ReviewManagementDTO();
         // Try to find target purchase order
         Optional<PurchaseOrderEntity> purchaseOrderOptional = purchaseOrderRepository.findById(purchaseOrderId);
@@ -263,9 +263,32 @@ public class UserService {
                             ReviewEntity review = new ReviewEntity();
                             review.setPurchaseOrderId(purchaseOrderId);
                             review.setProductId(productId);
-                            review.setStars(Math.min(Math.abs(rating), 5));
+                            review.setStars(Math.min(Math.abs(stars), 5));
                             review.setContent(content);
                             review.setCommentDate(BigDecimal.valueOf(System.currentTimeMillis()).toString());
+                            // Modify product's rating
+                            Optional<ProductEntity> productOptional = productRepository.findById(productId);
+                            // Remove the affect of old review
+                            int oldStars;
+                            ReviewEntityPK reviewPK = new ReviewEntityPK();
+                            reviewPK.setProductId(productId);
+                            reviewPK.setPurchaseOrderId(purchaseOrderId);
+                            if (reviewRepository.findById(reviewPK).isPresent()) {
+                                oldStars = reviewRepository.findById(reviewPK).get().getStars();
+                                if (productOptional.isPresent()) {
+                                    ProductEntity product = productOptional.get();
+                                    product.setTotalStars(product.getTotalStars() - oldStars);
+                                    product.setTotalComments(product.getTotalComments() - 1);
+                                    productRepository.save(product);
+                                }
+                            }
+                            // Add affect of new review
+                            if (productOptional.isPresent()) {
+                                ProductEntity product = productOptional.get();
+                                product.setTotalStars(product.getTotalStars() + stars);
+                                product.setTotalComments(product.getTotalComments() + 1);
+                                productRepository.save(product);
+                            }
                             reviewRepository.save(review);
                             // Save review
                             reviewManagementDTO.setSuccess(true);
@@ -294,19 +317,22 @@ public class UserService {
         PaginationDTO<ReviewDTO> paginationDTO = new PaginationDTO<>();
         Pageable pageable = PageRequest.of(page - 1, 10);
         Page<ReviewEntity> reviewPages = reviewRepository.findAllByProductId(productId, pageable);
-
+        // Construct paginationDTO
         paginationDTO.setCurrentPage(page);
         paginationDTO.setTotalPages(reviewPages.getTotalPages());
         paginationDTO.setItemList(new LinkedList<>());
         for (ReviewEntity review :
                 reviewPages) {
             ReviewDTO reviewDTO = new ReviewDTO();
-            reviewDTO.setRating(review.getStars());
+            reviewDTO.setStars(review.getStars());
             reviewDTO.setContent(review.getContent());
-            reviewDTO.setCommentDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Double.valueOf(review.getCommentDate())));
+            reviewDTO.setCommentDate(
+                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(
+                            Double.valueOf(review.getCommentDate())));
 
             purchaseOrderRepository.findById(review.getPurchaseOrderId()).flatMap(purchaseOrderEntity ->
-                    userRepository.findById(purchaseOrderEntity.getUserId())).ifPresent(userEntity -> reviewDTO.setUserName(userEntity.getName()));
+                    userRepository.findById(purchaseOrderEntity.getUserId())).ifPresent(userEntity ->
+                        reviewDTO.setUserName(userEntity.getName()));
             paginationDTO.getItemList().add(reviewDTO);
         }
         return paginationDTO;

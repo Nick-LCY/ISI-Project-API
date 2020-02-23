@@ -17,6 +17,8 @@ public class ProductEntity {
     private BigDecimal price;
     private boolean outOfStock;
     private String thumbnailLocation;
+    private Integer totalStars;
+    private Integer totalComments;
 
     @Id
     @Column(name = "id")
@@ -76,6 +78,26 @@ public class ProductEntity {
 
     public void setThumbnailLocation(String thumbnailLocation) {
         this.thumbnailLocation = thumbnailLocation;
+    }
+
+    @Basic
+    @Column(name = "total_stars")
+    public Integer getTotalStars() {
+        return totalStars;
+    }
+
+    public void setTotalStars(Integer totalStars) {
+        this.totalStars = totalStars;
+    }
+
+    @Basic
+    @Column(name = "total_comments")
+    public Integer getTotalComments() {
+        return totalComments;
+    }
+
+    public void setTotalComments(Integer totalComments) {
+        this.totalComments = totalComments;
     }
 
     @Override

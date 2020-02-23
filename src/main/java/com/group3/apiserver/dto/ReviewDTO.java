@@ -10,7 +10,7 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ReviewDTO {
     private String userName;
-    private Integer rating;
+    private Integer stars;
     private String content;
     private String commentDate;
 }
