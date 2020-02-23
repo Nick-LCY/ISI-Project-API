@@ -1,18 +1,19 @@
 package com.group3.apiserver.service;
 
-import com.group3.apiserver.dto.ReviewManagementDTO;
-import com.group3.apiserver.dto.ShoppingCartManagementDTO;
-import com.group3.apiserver.dto.UserManagementDTO;
+import com.group3.apiserver.dto.*;
 import com.group3.apiserver.entity.*;
 import com.group3.apiserver.message.ErrorMessage;
 import com.group3.apiserver.repository.*;
 import com.group3.apiserver.util.AuthenticationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.regex.Pattern;
 
 @Service
@@ -246,7 +247,7 @@ public class UserService {
         Optional<PurchaseOrderEntity> purchaseOrderOptional = purchaseOrderRepository.findById(purchaseOrderId);
         if (purchaseOrderOptional.isPresent()) {
             // Check if purchase order's status is "shipped"
-            if (purchaseOrderOptional.get().getStatus() == 3) {
+            if (purchaseOrderOptional.get().getStatus() == 2) {
                 Optional<UserEntity> userOptional = userRepository.findById(purchaseOrderOptional.get().getUserId());
                 userOptional.ifPresent(user -> {
                     // User authentication
@@ -264,6 +265,7 @@ public class UserService {
                             review.setProductId(productId);
                             review.setStars(Math.min(Math.abs(rating), 5));
                             review.setContent(content);
+                            review.setCommentDate(BigDecimal.valueOf(System.currentTimeMillis()).toString());
                             reviewRepository.save(review);
                             // Save review
                             reviewManagementDTO.setSuccess(true);
@@ -286,5 +288,27 @@ public class UserService {
             reviewManagementDTO.setMessage(ErrorMessage.PURCHASE_ORDER_NOT_FOUND);
         }
         return reviewManagementDTO;
+    }
+
+    public PaginationDTO<ReviewDTO> getReviews(Integer productId, Integer page) {
+        PaginationDTO<ReviewDTO> paginationDTO = new PaginationDTO<>();
+        Pageable pageable = PageRequest.of(page - 1, 10);
+        Page<ReviewEntity> reviewPages = reviewRepository.findAllByProductId(productId, pageable);
+
+        paginationDTO.setCurrentPage(page);
+        paginationDTO.setTotalPages(reviewPages.getTotalPages());
+        paginationDTO.setItemList(new LinkedList<>());
+        for (ReviewEntity review :
+                reviewPages) {
+            ReviewDTO reviewDTO = new ReviewDTO();
+            reviewDTO.setRating(review.getStars());
+            reviewDTO.setContent(review.getContent());
+            reviewDTO.setCommentDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Double.valueOf(review.getCommentDate())));
+
+            purchaseOrderRepository.findById(review.getPurchaseOrderId()).flatMap(purchaseOrderEntity ->
+                    userRepository.findById(purchaseOrderEntity.getUserId())).ifPresent(userEntity -> reviewDTO.setUserName(userEntity.getName()));
+            paginationDTO.getItemList().add(reviewDTO);
+        }
+        return paginationDTO;
     }
 }

@@ -1,8 +1,6 @@
 package com.group3.apiserver.controller;
 
-import com.group3.apiserver.dto.ReviewManagementDTO;
-import com.group3.apiserver.dto.ShoppingCartManagementDTO;
-import com.group3.apiserver.dto.UserManagementDTO;
+import com.group3.apiserver.dto.*;
 import com.group3.apiserver.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -71,5 +69,11 @@ public class UserController {
                                               @RequestParam(name = "rating", defaultValue = "5") Integer rating,
                                               @RequestParam(name = "content") String content) {
         return userService.saveUserReview(purchaseOrderId, productId, token, rating, content);
+    }
+
+    @GetMapping("/reviews")
+    public PaginationDTO<ReviewDTO> getReviews(@RequestParam(name = "product_id") Integer productId,
+                                               @RequestParam(name = "page") Integer page) {
+        return userService.getReviews(productId, page);
     }
 }

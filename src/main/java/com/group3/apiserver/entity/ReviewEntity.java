@@ -11,6 +11,7 @@ public class ReviewEntity {
     private int purchaseOrderId;
     private int stars;
     private String content;
+    private String commentDate;
 
     @Id
     @Column(name = "product_id")
@@ -50,6 +51,16 @@ public class ReviewEntity {
 
     public void setContent(String review) {
         this.content = review;
+    }
+
+    @Basic
+    @Column(name = "comment_date")
+    public String getCommentDate() {
+        return commentDate;
+    }
+
+    public void setCommentDate(String commentDate) {
+        this.commentDate = commentDate;
     }
 
     @Override
