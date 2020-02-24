@@ -36,7 +36,7 @@ public class UserController {
 
     @PostMapping("/change_pwd")
     public UserManagementDTO changePwd(@RequestParam(name = "id") Integer id,
-                                       @RequestParam(name = "old_pwd") String oldPwd,
+                                       @RequestParam(name = "current_pwd") String oldPwd,
                                        @RequestParam(name = "new_pwd") String newPwd) {
         return userService.changePwd(id, oldPwd, newPwd);
     }
