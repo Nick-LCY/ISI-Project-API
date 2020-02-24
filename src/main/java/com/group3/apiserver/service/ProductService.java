@@ -54,6 +54,9 @@ public class ProductService {
             productListItemDTO.setCategory(product.getCategory());
             productListItemDTO.setPrice(product.getPrice());
             productListItemDTO.setOutOfStock(product.getOutOfStock());
+            productListItemDTO.setRating(product.getTotalComments() != 0?
+                    Double.parseDouble(product.getTotalStars().toString())
+                            / Double.parseDouble(product.getTotalComments().toString()):0);
             productListItemDTO.setThumbnailLocation(product.getThumbnailLocation());
             paginationDTO.getItemList().add(productListItemDTO);
         }
@@ -65,7 +68,11 @@ public class ProductService {
         Optional<ProductEntity> productEntityOptional =productRepository.findById(id);
         ProductDetailDTO productDetailDTO = null;
         if (productEntityOptional.isPresent()) {
-            productDetailDTO = new ProductDetailDTO(productEntityOptional.get());
+            ProductEntity product = productEntityOptional.get();
+            productDetailDTO = new ProductDetailDTO(product);
+            productDetailDTO.setRating(product.getTotalComments() != 0?
+                    Double.parseDouble(product.getTotalStars().toString())
+                            / Double.parseDouble(product.getTotalComments().toString()):0);
             productDetailDTO.setProductPhotographs(productPhotographRepository.findAllByProductId(productDetailDTO.getId()));
             productDetailDTO.setProductDescriptions(productDescriptionRepository.findAllByProductId(productDetailDTO.getId()));
         }

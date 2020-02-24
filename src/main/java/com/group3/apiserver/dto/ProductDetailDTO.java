@@ -29,4 +29,5 @@ public class ProductDetailDTO {
     private String thumbnailLocation;
     private Set<ProductPhotographEntity> productPhotographs;
     private Set<ProductDescriptionEntity> productDescriptions;
+    private Double rating;
 }

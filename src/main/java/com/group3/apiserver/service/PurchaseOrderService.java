@@ -83,8 +83,8 @@ public class PurchaseOrderService {
 
             purchaseOrder.setUserId(createPurchaseOrderDTO.getUserId());
 
-            double timestamp = System.currentTimeMillis();
-            purchaseOrder.setPurchaseDate(BigDecimal.valueOf(timestamp).toString());
+            long timestamp = System.currentTimeMillis();
+            purchaseOrder.setPurchaseDate(Long.toString(timestamp));
             purchaseOrderDTO.setPurchaseDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(timestamp));
 
             purchaseOrder.setStatus(0);

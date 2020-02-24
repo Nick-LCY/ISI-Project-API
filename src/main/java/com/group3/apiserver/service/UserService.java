@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -241,6 +242,7 @@ public class UserService {
         return shoppingCartManagementDTO;
     }
 
+    @Transactional
     public ReviewManagementDTO saveUserReview(Integer purchaseOrderId, Integer productId, String token, Integer stars, String content) {
         ReviewManagementDTO reviewManagementDTO = new ReviewManagementDTO();
         // Try to find target purchase order
@@ -265,7 +267,7 @@ public class UserService {
                             review.setProductId(productId);
                             review.setStars(Math.min(Math.abs(stars), 5));
                             review.setContent(content);
-                            review.setCommentDate(BigDecimal.valueOf(System.currentTimeMillis()).toString());
+                            review.setCommentDate(Long.toString(System.currentTimeMillis()));
                             // Modify product's rating
                             Optional<ProductEntity> productOptional = productRepository.findById(productId);
                             // Remove the affect of old review

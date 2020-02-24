@@ -14,5 +14,6 @@ public class ProductListItemDTO {
     private String category;
     private BigDecimal price;
     private boolean outOfStock;
+    private double rating;
     private String thumbnailLocation;
 }
