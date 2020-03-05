@@ -1,6 +1,5 @@
 package com.group3.apiserver.service;
 
-import com.group3.apiserver.dto.PaginationDTO;
 import com.group3.apiserver.dto.purchaseorder.CreatePurchaseOrderDTO;
 import com.group3.apiserver.dto.purchaseorder.PurchaseManagementDTO;
 import com.group3.apiserver.dto.purchaseorder.list.PurchaseOrderListDTO;
@@ -17,7 +16,6 @@ import com.group3.apiserver.repository.PurchaseOrderRepository;
 import com.group3.apiserver.repository.UserRepository;
 import com.group3.apiserver.util.AuthenticationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -205,42 +203,31 @@ public class PurchaseOrderService {
         return purchaseManagementDTO;
     }
 
-    public PurchaseManagementDTO getPurchaseOrders(Integer userId, String token, String statusKey, Integer page) {
+    public PurchaseManagementDTO getPurchaseOrders(Integer userId, String token) {
         // Init needed DTOs
         PurchaseManagementDTO purchaseManagementDTO = new PurchaseManagementDTO();
-        PaginationDTO<PurchaseOrderListDTO> paginationDTO = new PaginationDTO<>();
-        paginationDTO.setItemList(new LinkedList<>());
+        purchaseManagementDTO.setPurchaseOrderListDTOList(new LinkedList<>());
         // User authentication
         if (authenticationUtil.userAuthentication(userId, token)) {
-            // Select page from database by statusKey
-            Page<PurchaseOrderEntity> purchaseOrderPage;
-            Pageable pageable = PageRequest.of(page - 1, 10);
-            if (statusKey.equals("current")) {
-                purchaseOrderPage
-                        = purchaseOrderRepository.findAllByUserIdAndTwoStatus(userId, 0, 1, pageable);
-            } else if (statusKey.equals("past")) {
-                purchaseOrderPage
-                        = purchaseOrderRepository.findAllByUserIdAndTwoStatus(userId, 2, 3, pageable);
-            } else {
-                purchaseManagementDTO.setSuccess(false);
-                purchaseManagementDTO.setMessage(ErrorMessage.INVALID_STATUS);
-                return purchaseManagementDTO;
-            }
+            boolean isVendor = authenticationUtil.vendorAuthentication(userId, token);
+            // If is vendor, get all purchase orders
+            List<PurchaseOrderEntity> purchaseOrderList = isVendor
+                    ?purchaseOrderRepository.findAll()
+                    :purchaseOrderRepository.findAllByUserId(userId);
             // Convert PurchaseOrder to PurchaseOrderDTO and construct paginationDTO
-            paginationDTO.setTotalPages(purchaseOrderPage.getTotalPages());
-            paginationDTO.setCurrentPage(page);
             for (PurchaseOrderEntity purchaseOrder :
-                    purchaseOrderPage.toList()) {
+                    purchaseOrderList) {
                 PurchaseOrderListDTO purchaseOrderListDTO = new PurchaseOrderListDTO();
                 purchaseOrderListDTO.setPurchaseOrderId(purchaseOrder.getId());
                 purchaseOrderListDTO.setPurchaseDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Double.valueOf(purchaseOrder.getPurchaseDate())));
                 purchaseOrderListDTO.setStatusInString(statusList[purchaseOrder.getStatus()]);
                 purchaseOrderListDTO.setTotalAmount(purchaseOrder.getTotalAmount());
-                paginationDTO.getItemList().add(purchaseOrderListDTO);
+                assert userRepository.findById(purchaseOrder.getUserId()).isPresent();
+                purchaseOrderListDTO.setCustomerName(isVendor?userRepository.findById(purchaseOrder.getUserId()).get().getName():null);
+                purchaseManagementDTO.getPurchaseOrderListDTOList().add(purchaseOrderListDTO);
             }
             // Construct purchaseManagementDTO
             purchaseManagementDTO.setSuccess(true);
-            purchaseManagementDTO.setPurchaseOrdersPagination(paginationDTO);
         } else {
             purchaseManagementDTO.setSuccess(false);
             purchaseManagementDTO.setMessage(ErrorMessage.AUTHENTICATION_FAIL);
