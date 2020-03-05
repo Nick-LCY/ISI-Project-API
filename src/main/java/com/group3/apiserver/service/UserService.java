@@ -113,6 +113,7 @@ public class UserService {
                 user = userRepository.save(user);
                 loginDTO.setId(user.getId());
                 loginDTO.setName(user.getName());
+                loginDTO.setType(user.getIsVendor());
             } else {
                 loginDTO.setSuccess(false);
             }

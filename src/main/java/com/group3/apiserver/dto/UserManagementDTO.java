@@ -11,4 +11,5 @@ public class UserManagementDTO {
     private String name;
     private String token;
     private String message;
+    private boolean type;
 }
