@@ -1,6 +1,6 @@
 package com.group3.apiserver.service;
 
-import com.group3.apiserver.dto.purchaseorder.CreatePurchaseOrderDTO;
+import com.group3.apiserver.dto.receiver.CreatePurchaseOrderDTO;
 import com.group3.apiserver.dto.purchaseorder.PurchaseManagementDTO;
 import com.group3.apiserver.dto.purchaseorder.list.PurchaseOrderListDTO;
 import com.group3.apiserver.dto.purchaseorder.detail.PurchaseDetailDTO;
@@ -16,8 +16,6 @@ import com.group3.apiserver.repository.PurchaseOrderRepository;
 import com.group3.apiserver.repository.UserRepository;
 import com.group3.apiserver.util.AuthenticationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;

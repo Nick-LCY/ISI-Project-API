@@ -1,6 +1,7 @@
 package com.group3.apiserver.controller;
 
 import com.group3.apiserver.dto.*;
+import com.group3.apiserver.dto.receiver.user.*;
 import com.group3.apiserver.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,37 +17,41 @@ public class UserController {
     }
 
     @PostMapping("/user")
-    public UserManagementDTO createUser(@RequestParam(name = "email") String email,
-                                        @RequestParam(name = "pwd") String pwd,
-                                        @RequestParam(name = "name") String name,
-                                        @RequestParam(name = "shipping_addr") String shippingAddr){
-        return userService.creatUser(email, pwd, name, shippingAddr);
+    public UserManagementDTO createUser(@RequestBody CreateUserDTO createUserParas){
+        return userService.creatUser(
+                createUserParas.getEmail(),
+                createUserParas.getPwd(),
+                createUserParas.getName(),
+                createUserParas.getShippingAddr()
+        );
     }
 
     @PostMapping("/login")
-    public UserManagementDTO login(@RequestParam(name = "email") String email,
-                                   @RequestParam(name = "pwd") String pwd) {
-        return userService.login(email, pwd);
+    public UserManagementDTO login(@RequestBody LoginDTO loginParas) {
+        return userService.login(loginParas.getEmail(), loginParas.getPwd());
     }
 
-    @PostMapping("/logout")
-    public UserManagementDTO logout(@RequestParam(name = "id") Integer id) {
-        return userService.logout(id);
+    @PostMapping(path = "/logout")
+    public UserManagementDTO logout(@RequestBody LogoutDTO logoutParas) {
+        return userService.logout(logoutParas.getId());
     }
 
     @PostMapping("/change_pwd")
-    public UserManagementDTO changePwd(@RequestParam(name = "id") Integer id,
-                                       @RequestParam(name = "current_pwd") String oldPwd,
-                                       @RequestParam(name = "new_pwd") String newPwd) {
-        return userService.changePwd(id, oldPwd, newPwd);
+    public UserManagementDTO changePwd(@RequestBody ChangePwdDTO changePwdParas) {
+        return userService.changePwd(
+                changePwdParas.getId(),
+                changePwdParas.getCurrentPwd(),
+                changePwdParas.getNewPwd()
+        );
     }
 
     @PostMapping("/shopping_cart")
-    public ShoppingCartManagementDTO modifyShoppingCart(@RequestParam(name = "user_id") Integer userId,
-                                                        @RequestParam(name = "product_id") Integer productId,
-                                                        @RequestParam(name = "quantity") Integer quantity,
-                                                        @RequestParam(name = "token") String token) {
-        return userService.modifyShoppingCartItem(userId, productId, quantity, token);
+    public ShoppingCartManagementDTO modifyShoppingCart(@RequestBody ModifyShoppingCartDTO modifyShoppingCartParas) {
+        return userService.modifyShoppingCartItem(
+                modifyShoppingCartParas.getUserId(),
+                modifyShoppingCartParas.getProductId(),
+                modifyShoppingCartParas.getQuantity(),
+                modifyShoppingCartParas.getToken());
     }
 
     @GetMapping("/shopping_cart")
@@ -63,12 +68,13 @@ public class UserController {
     }
 
     @PostMapping("/review")
-    public ReviewManagementDTO saveUserReview(@RequestParam(name = "po_no") Integer purchaseOrderId,
-                                              @RequestParam(name = "product_id") Integer productId,
-                                              @RequestParam(name = "token") String token,
-                                              @RequestParam(name = "star", defaultValue = "5") Integer stars,
-                                              @RequestParam(name = "content") String content) {
-        return userService.saveUserReview(purchaseOrderId, productId, token, stars, content);
+    public ReviewManagementDTO saveUserReview(@RequestBody SaveUserReviewDTO saveUserReviewParas) {
+        return userService.saveUserReview(
+                saveUserReviewParas.getPurchaseOrderId(),
+                saveUserReviewParas.getProductId(),
+                saveUserReviewParas.getToken(),
+                saveUserReviewParas.getStars(),
+                saveUserReviewParas.getContent());
     }
 
     @GetMapping("/reviews")
