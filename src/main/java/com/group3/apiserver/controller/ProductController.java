@@ -5,9 +5,15 @@ import com.group3.apiserver.dto.ProductDetailDTO;
 import com.group3.apiserver.dto.ProductListItemDTO;
 import com.group3.apiserver.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -58,14 +64,16 @@ public class ProductController {
 
     @PostMapping("/upload_example")
     public String test(@RequestParam("file1") MultipartFile multipartFile1, @RequestParam("file2") MultipartFile multipartFile2) {
-        String addr = "C:\\Users\\nucle\\Desktop\\";
-        addr += multipartFile1.getOriginalFilename();
         try {
+            ResourceUtils.getFile("classpath:static");
+            Resource fileResource = new ClassPathResource("static");
+            File dir = fileResource.getFile();
+            String addr = dir.getAbsolutePath() + "\\" + multipartFile1.getOriginalFilename();
             Files.write(Paths.get(addr), multipartFile1.getBytes());
-            return "Success";
-        } catch (Exception e) {
+            return "<a href=\"/static/" + multipartFile1.getOriginalFilename() + "\">Check It!</a>";
+        } catch (IOException e) {
             e.printStackTrace();
-            return "Fail";
+            return "fail";
         }
     }
 }
