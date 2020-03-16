@@ -52,25 +52,19 @@ public class ProductController {
         return productService.deleteThumbnail(userId, token, productId);
     }
 
-//    @PostMapping("/photograph")
-//    public FileProcessingDTO test2(@RequestParam("photograph") MultipartFile photograph,
-//                                   @RequestParam("user_id") Integer userId,
-//                                   @RequestParam("product_id") Integer productId,
-//                                   @RequestParam("token") String token) {
-//        return productService.uploadPhotograph(photograph, userId, productId, token);
-//    }
-//
-//    @DeleteMapping("/photograph")
-//    public FileProcessingDTO deletePhotograph(@RequestParam("user_id") Integer userId,
-//                                              @RequestParam("token") String token,
-//                                              @RequestParam("product_id") Integer productId,
-//                                              @RequestParam("photograph_id") Integer photographId) {
-//        System.out.println(userId);
-//        System.out.println(token);
-//        System.out.println(productId);
-//        System.out.println(photographId);
-//        FileProcessingDTO fileProcessingDTO = new FileProcessingDTO();
-//        fileProcessingDTO.setSuccess(true);
-//        return fileProcessingDTO;
-//    }
+    @PostMapping("/photograph")
+    public FileProcessingDTO test2(@RequestParam("photograph") MultipartFile photograph,
+                                   @RequestParam("user_id") Integer userId,
+                                   @RequestParam("product_id") Integer productId,
+                                   @RequestParam("token") String token) {
+        return productService.uploadPhotograph(photograph, userId, productId, token);
+    }
+
+    @DeleteMapping("/photograph")
+    public FileProcessingDTO deletePhotograph(@RequestParam("user_id") Integer userId,
+                                              @RequestParam("token") String token,
+                                              @RequestParam("product_id") Integer productId,
+                                              @RequestParam("photograph_id") Integer photographId) {
+        return productService.deletePhotograph(userId, token, productId, photographId);
+    }
 }

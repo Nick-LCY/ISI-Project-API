@@ -5,6 +5,7 @@ import com.group3.apiserver.dto.ProductDetailDTO;
 import com.group3.apiserver.dto.ProductListItemDTO;
 import com.group3.apiserver.dto.sender.FileProcessingDTO;
 import com.group3.apiserver.entity.ProductEntity;
+import com.group3.apiserver.entity.ProductPhotographEntity;
 import com.group3.apiserver.message.ErrorMessage;
 import com.group3.apiserver.repository.ProductDescriptionRepository;
 import com.group3.apiserver.repository.ProductPhotographRepository;
@@ -136,7 +137,6 @@ public class ProductService {
                 ProductEntity product = productOptional.get();
                 String fileName = product.getThumbnailLocation();
                 fileName = fileName.substring(fileName.indexOf("/static/") + 8);
-                System.out.println(fileName);
                 if (!fileProcessingUtil.deleteFile(fileName)) {
                     fileProcessingDTO.setSuccess(false);
                     return fileProcessingDTO;
@@ -155,14 +155,65 @@ public class ProductService {
         return fileProcessingDTO;
     }
 
-//    public FileProcessingDTO uploadPhotograph(MultipartFile photograph, Integer userId, Integer productId, String token) {
-//        FileProcessingDTO fileProcessingDTO = new FileProcessingDTO();
-//        if (authenticationUtil.vendorAuthentication(userId, token)) {
-//
-//        } else {
-//            fileProcessingDTO.setSuccess(false);
-//            fileProcessingDTO.setMessage(ErrorMessage.AUTHENTICATION_FAIL);
-//        }
-//        return fileProcessingDTO;
-//    }
+    public FileProcessingDTO uploadPhotograph(MultipartFile photograph, Integer userId, Integer productId, String token) {
+        FileProcessingDTO fileProcessingDTO = new FileProcessingDTO();
+        if (authenticationUtil.vendorAuthentication(userId, token)) {
+            Optional<ProductEntity> productOptional = productRepository.findById(productId);
+            if (productOptional.isPresent()) {
+                String photographLocation;
+                try {
+                    photographLocation = fileProcessingUtil.saveFile(photograph);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    fileProcessingDTO.setSuccess(false);
+                    return fileProcessingDTO;
+                }
+                ProductPhotographEntity productPhotograph = new ProductPhotographEntity();
+                productPhotograph.setProductId(productId);
+                productPhotograph.setFileLocation(photographLocation);
+                // TODO: Need to get sequence from frontend
+                productPhotograph.setSequence(1);
+                productPhotograph = productPhotographRepository.save(productPhotograph);
+                fileProcessingDTO.setSuccess(true);
+                fileProcessingDTO.setFileLink(photographLocation);
+                fileProcessingDTO.setFileId(productPhotograph.getId());
+            } else {
+                fileProcessingDTO.setSuccess(false);
+                fileProcessingDTO.setMessage(ErrorMessage.PRODUCT_NOT_FOUND);
+            }
+        } else {
+            fileProcessingDTO.setSuccess(false);
+            fileProcessingDTO.setMessage(ErrorMessage.AUTHENTICATION_FAIL);
+        }
+        return fileProcessingDTO;
+    }
+
+    public FileProcessingDTO deletePhotograph(Integer userId, String token, Integer productId, Integer photographId) {
+        FileProcessingDTO fileProcessingDTO = new FileProcessingDTO();
+        if (authenticationUtil.vendorAuthentication(userId, token)) {
+            Optional<ProductEntity> productOptional = productRepository.findById(productId);
+            if (productOptional.isPresent()) {
+                Optional<ProductPhotographEntity> productPhotographOptional
+                        = productPhotographRepository.findById(photographId);
+                if (productPhotographOptional.isPresent()) {
+                    ProductPhotographEntity productPhotograph = productPhotographOptional.get();
+                    String fileName = productPhotograph.getFileLocation();
+                    fileName = fileName.substring(fileName.indexOf("/static/") + 8);
+                    if (!fileProcessingUtil.deleteFile(fileName)) {
+                        fileProcessingDTO.setSuccess(false);
+                        return fileProcessingDTO;
+                    }
+                    productPhotographRepository.deleteById(photographId);
+                    fileProcessingDTO.setSuccess(true);
+                }
+            } else {
+                fileProcessingDTO.setSuccess(false);
+                fileProcessingDTO.setMessage(ErrorMessage.PRODUCT_NOT_FOUND);
+            }
+        } else {
+            fileProcessingDTO.setSuccess(false);
+            fileProcessingDTO.setMessage(ErrorMessage.AUTHENTICATION_FAIL);
+        }
+        return fileProcessingDTO;
+    }
 }
