@@ -4,6 +4,7 @@ import com.group3.apiserver.dto.PaginationDTO;
 import com.group3.apiserver.dto.ProductDetailDTO;
 import com.group3.apiserver.dto.ProductListItemDTO;
 import com.group3.apiserver.dto.sender.FileProcessingDTO;
+import com.group3.apiserver.dto.sender.ProductManagementDTO;
 import com.group3.apiserver.entity.ProductEntity;
 import com.group3.apiserver.entity.ProductPhotographEntity;
 import com.group3.apiserver.message.ErrorMessage;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.Optional;
 
@@ -205,6 +207,8 @@ public class ProductService {
                     }
                     productPhotographRepository.deleteById(photographId);
                     fileProcessingDTO.setSuccess(true);
+                } else {
+                    fileProcessingDTO.setSuccess(false);
                 }
             } else {
                 fileProcessingDTO.setSuccess(false);
@@ -215,5 +219,26 @@ public class ProductService {
             fileProcessingDTO.setMessage(ErrorMessage.AUTHENTICATION_FAIL);
         }
         return fileProcessingDTO;
+    }
+
+    public ProductManagementDTO createProduct(Integer userId, String token, String name, String category, Double price) {
+        ProductManagementDTO productManagementDTO = new ProductManagementDTO();
+        if (authenticationUtil.vendorAuthentication(userId, token)) {
+            ProductEntity product = new ProductEntity();
+            product.setName(name);
+            product.setCategory(category);
+            product.setPrice(BigDecimal.valueOf(price));
+            product.setOutOfStock(false);
+            product.setThumbnailLocation("");
+            product.setTotalStars(0);
+            product.setTotalComments(0);
+            product = productRepository.save(product);
+            productManagementDTO.setSuccess(true);
+            productManagementDTO.setProductId(product.getId());
+        } else {
+            productManagementDTO.setSuccess(false);
+            productManagementDTO.setMessage(ErrorMessage.AUTHENTICATION_FAIL);
+        }
+        return productManagementDTO;
     }
 }

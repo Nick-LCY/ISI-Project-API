@@ -17,41 +17,41 @@ public class UserController {
     }
 
     @PostMapping("/user")
-    public UserManagementDTO createUser(@RequestBody CreateUserDTO createUserParas){
+    public UserManagementDTO createUser(@RequestBody CreateUserDTO createUserParams){
         return userService.creatUser(
-                createUserParas.getEmail(),
-                createUserParas.getPwd(),
-                createUserParas.getName(),
-                createUserParas.getShippingAddr()
+                createUserParams.getEmail(),
+                createUserParams.getPwd(),
+                createUserParams.getName(),
+                createUserParams.getShippingAddr()
         );
     }
 
     @PostMapping("/login")
-    public UserManagementDTO login(@RequestBody LoginDTO loginParas) {
-        return userService.login(loginParas.getEmail(), loginParas.getPwd());
+    public UserManagementDTO login(@RequestBody LoginDTO loginParams) {
+        return userService.login(loginParams.getEmail(), loginParams.getPwd());
     }
 
     @PostMapping(path = "/logout")
-    public UserManagementDTO logout(@RequestBody LogoutDTO logoutParas) {
-        return userService.logout(logoutParas.getId());
+    public UserManagementDTO logout(@RequestBody LogoutDTO logoutParams) {
+        return userService.logout(logoutParams.getId());
     }
 
     @PostMapping("/change_pwd")
-    public UserManagementDTO changePwd(@RequestBody ChangePwdDTO changePwdParas) {
+    public UserManagementDTO changePwd(@RequestBody ChangePwdDTO changePwdParams) {
         return userService.changePwd(
-                changePwdParas.getId(),
-                changePwdParas.getCurrentPwd(),
-                changePwdParas.getNewPwd()
+                changePwdParams.getId(),
+                changePwdParams.getCurrentPwd(),
+                changePwdParams.getNewPwd()
         );
     }
 
     @PostMapping("/shopping_cart")
-    public ShoppingCartManagementDTO modifyShoppingCart(@RequestBody ModifyShoppingCartDTO modifyShoppingCartParas) {
+    public ShoppingCartManagementDTO modifyShoppingCart(@RequestBody ModifyShoppingCartDTO modifyShoppingCartParams) {
         return userService.modifyShoppingCartItem(
-                modifyShoppingCartParas.getUserId(),
-                modifyShoppingCartParas.getProductId(),
-                modifyShoppingCartParas.getQuantity(),
-                modifyShoppingCartParas.getToken());
+                modifyShoppingCartParams.getUserId(),
+                modifyShoppingCartParams.getProductId(),
+                modifyShoppingCartParams.getQuantity(),
+                modifyShoppingCartParams.getToken());
     }
 
     @GetMapping("/shopping_cart")

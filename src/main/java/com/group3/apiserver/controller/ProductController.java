@@ -3,7 +3,9 @@ package com.group3.apiserver.controller;
 import com.group3.apiserver.dto.PaginationDTO;
 import com.group3.apiserver.dto.ProductDetailDTO;
 import com.group3.apiserver.dto.ProductListItemDTO;
+import com.group3.apiserver.dto.receiver.product.CreateProductDTO;
 import com.group3.apiserver.dto.sender.FileProcessingDTO;
+import com.group3.apiserver.dto.sender.ProductManagementDTO;
 import com.group3.apiserver.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -53,10 +55,10 @@ public class ProductController {
     }
 
     @PostMapping("/photograph")
-    public FileProcessingDTO test2(@RequestParam("photograph") MultipartFile photograph,
-                                   @RequestParam("user_id") Integer userId,
-                                   @RequestParam("product_id") Integer productId,
-                                   @RequestParam("token") String token) {
+    public FileProcessingDTO uploadPhotograph(@RequestParam("photograph") MultipartFile photograph,
+                                              @RequestParam("user_id") Integer userId,
+                                              @RequestParam("product_id") Integer productId,
+                                              @RequestParam("token") String token) {
         return productService.uploadPhotograph(photograph, userId, productId, token);
     }
 
@@ -66,5 +68,16 @@ public class ProductController {
                                               @RequestParam("product_id") Integer productId,
                                               @RequestParam("photograph_id") Integer photographId) {
         return productService.deletePhotograph(userId, token, productId, photographId);
+    }
+
+    @PostMapping("/product")
+    public ProductManagementDTO createProduct(@RequestBody CreateProductDTO createProductParams) {
+        return productService.createProduct(
+                createProductParams.getUserId(),
+                createProductParams.getToken(),
+                createProductParams.getName(),
+                createProductParams.getCategory(),
+                createProductParams.getPrice()
+        );
     }
 }
