@@ -234,7 +234,7 @@ public class ProductService {
             product.setTotalComments(0);
             product = productRepository.save(product);
             productManagementDTO.setSuccess(true);
-            productManagementDTO.setProductId(product.getId());
+            productManagementDTO.addProductDetailDTO(product.getId());
         } else {
             productManagementDTO.setSuccess(false);
             productManagementDTO.setMessage(ErrorMessage.AUTHENTICATION_FAIL);
