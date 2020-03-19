@@ -3,6 +3,7 @@ package com.group3.apiserver.controller;
 import com.group3.apiserver.dto.PaginationDTO;
 import com.group3.apiserver.dto.ProductDetailDTO;
 import com.group3.apiserver.dto.ProductListItemDTO;
+import com.group3.apiserver.dto.receiver.product.AddDescriptionDTO;
 import com.group3.apiserver.dto.receiver.product.CreateProductDTO;
 import com.group3.apiserver.dto.sender.FileProcessingDTO;
 import com.group3.apiserver.dto.sender.ProductManagementDTO;
@@ -78,6 +79,15 @@ public class ProductController {
                 createProductParams.getName(),
                 createProductParams.getCategory(),
                 createProductParams.getPrice()
+        );
+    }
+
+    @PostMapping("/product_description")
+    public ProductManagementDTO addProductDescription(@RequestBody AddDescriptionDTO addDescriptionParams) {
+        return productService.addDescription(
+                addDescriptionParams.getUserId(),
+                addDescriptionParams.getToken(),
+                addDescriptionParams.getProductDescriptionsInEntity()
         );
     }
 }

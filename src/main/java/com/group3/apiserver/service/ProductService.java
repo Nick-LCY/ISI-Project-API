@@ -3,8 +3,10 @@ package com.group3.apiserver.service;
 import com.group3.apiserver.dto.PaginationDTO;
 import com.group3.apiserver.dto.ProductDetailDTO;
 import com.group3.apiserver.dto.ProductListItemDTO;
+import com.group3.apiserver.dto.receiver.product.AddDescriptionDTO;
 import com.group3.apiserver.dto.sender.FileProcessingDTO;
 import com.group3.apiserver.dto.sender.ProductManagementDTO;
+import com.group3.apiserver.entity.ProductDescriptionEntity;
 import com.group3.apiserver.entity.ProductEntity;
 import com.group3.apiserver.entity.ProductPhotographEntity;
 import com.group3.apiserver.message.ErrorMessage;
@@ -24,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -235,6 +238,30 @@ public class ProductService {
             product = productRepository.save(product);
             productManagementDTO.setSuccess(true);
             productManagementDTO.addProductDetailDTO(product.getId());
+        } else {
+            productManagementDTO.setSuccess(false);
+            productManagementDTO.setMessage(ErrorMessage.AUTHENTICATION_FAIL);
+        }
+        return productManagementDTO;
+    }
+
+    public ProductManagementDTO addDescription(Integer userId, String token, List<ProductDescriptionEntity> productDescriptions) {
+        ProductManagementDTO productManagementDTO = new ProductManagementDTO();
+        if (authenticationUtil.vendorAuthentication(userId, token)) {
+            Integer productId = productDescriptions.get(0).getProductId();
+            Optional<ProductEntity> productOptional = productRepository.findById(productId);
+            if (productOptional.isPresent()) {
+                List<ProductDescriptionEntity> productDescriptionList = new LinkedList<>();
+                for (ProductDescriptionEntity productDescription :
+                        productDescriptions) {
+                    productDescriptionList.add(productDescriptionRepository.save(productDescription));
+                }
+                productManagementDTO.setSuccess(true);
+                productManagementDTO.addProductDescriptions(productDescriptionList);
+            } else {
+                productManagementDTO.setSuccess(false);
+                productManagementDTO.setMessage(ErrorMessage.PRODUCT_NOT_FOUND);
+            }
         } else {
             productManagementDTO.setSuccess(false);
             productManagementDTO.setMessage(ErrorMessage.AUTHENTICATION_FAIL);
