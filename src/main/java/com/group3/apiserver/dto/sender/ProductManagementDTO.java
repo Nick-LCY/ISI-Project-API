@@ -26,6 +26,14 @@ public class ProductManagementDTO {
         this.productDetail = productDetailDTO;
     }
 
+    public void addProductDetailDTO(String name, String category, Double price) {
+        ProductDetailDTO productDetailDTO = new ProductDetailDTO();
+        productDetailDTO.setName(name);
+        productDetailDTO.setCategory(category);
+        productDetailDTO.setPrice(price);
+        productDetail = productDetailDTO;
+    }
+
     public void addProductDescriptions(List<ProductDescriptionEntity> productDescriptionList) {
         productDescriptions = new LinkedList<>();
         for (ProductDescriptionEntity productDescription :
@@ -46,6 +54,9 @@ public class ProductManagementDTO {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private static class ProductDetailDTO {
         private Integer id;
+        private String name;
+        private String category;
+        private Double price;
     }
 
     @Data

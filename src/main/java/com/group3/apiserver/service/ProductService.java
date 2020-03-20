@@ -3,7 +3,6 @@ package com.group3.apiserver.service;
 import com.group3.apiserver.dto.PaginationDTO;
 import com.group3.apiserver.dto.ProductDetailDTO;
 import com.group3.apiserver.dto.ProductListItemDTO;
-import com.group3.apiserver.dto.receiver.product.AddDescriptionDTO;
 import com.group3.apiserver.dto.sender.FileProcessingDTO;
 import com.group3.apiserver.dto.sender.ProductManagementDTO;
 import com.group3.apiserver.entity.ProductDescriptionEntity;
@@ -98,7 +97,7 @@ public class ProductService {
                     Double.parseDouble(product.getTotalStars().toString())
                             / Double.parseDouble(product.getTotalComments().toString()):0);
             productDetailDTO.setProductPhotographs(productPhotographRepository.findAllByProductId(productDetailDTO.getId()));
-            productDetailDTO.setProductDescriptions(productDescriptionRepository.findAllByProductId(productDetailDTO.getId()));
+            productDetailDTO.setProductDescriptions(productDescriptionRepository.findAllByProductIdOrderBySequence(productDetailDTO.getId()));
         }
         return productDetailDTO;
     }
@@ -224,7 +223,7 @@ public class ProductService {
         return fileProcessingDTO;
     }
 
-    public ProductManagementDTO createProduct(Integer userId, String token, String name, String category, Double price) {
+    public ProductManagementDTO modifyProductBasicInfo(Integer userId, String token, String name, String category, Double price) {
         ProductManagementDTO productManagementDTO = new ProductManagementDTO();
         if (authenticationUtil.vendorAuthentication(userId, token)) {
             ProductEntity product = new ProductEntity();
@@ -238,6 +237,34 @@ public class ProductService {
             product = productRepository.save(product);
             productManagementDTO.setSuccess(true);
             productManagementDTO.addProductDetailDTO(product.getId());
+        } else {
+            productManagementDTO.setSuccess(false);
+            productManagementDTO.setMessage(ErrorMessage.AUTHENTICATION_FAIL);
+        }
+        return productManagementDTO;
+    }
+
+    public ProductManagementDTO modifyProductBasicInfo(Integer userId,
+                                                       String token,
+                                                       Integer productId,
+                                                       String name,
+                                                       String category,
+                                                       Double price) {
+        ProductManagementDTO productManagementDTO = new ProductManagementDTO();
+        if (authenticationUtil.vendorAuthentication(userId, token)) {
+            Optional<ProductEntity> productOptional = productRepository.findById(productId);
+            if (productOptional.isPresent()) {
+                ProductEntity product = productOptional.get();
+                product.setName(name);
+                product.setCategory(category);
+                product.setPrice(BigDecimal.valueOf(price));
+                productRepository.save(product);
+                productManagementDTO.setSuccess(true);
+                productManagementDTO.addProductDetailDTO(name, category, price);
+            } else {
+                productManagementDTO.setSuccess(false);
+                productManagementDTO.setMessage(ErrorMessage.PRODUCT_NOT_FOUND);
+            }
         } else {
             productManagementDTO.setSuccess(false);
             productManagementDTO.setMessage(ErrorMessage.AUTHENTICATION_FAIL);

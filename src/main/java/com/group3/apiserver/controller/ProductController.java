@@ -4,7 +4,7 @@ import com.group3.apiserver.dto.PaginationDTO;
 import com.group3.apiserver.dto.ProductDetailDTO;
 import com.group3.apiserver.dto.ProductListItemDTO;
 import com.group3.apiserver.dto.receiver.product.AddDescriptionDTO;
-import com.group3.apiserver.dto.receiver.product.CreateProductDTO;
+import com.group3.apiserver.dto.receiver.product.modifyProductBasicInfoDTO;
 import com.group3.apiserver.dto.sender.FileProcessingDTO;
 import com.group3.apiserver.dto.sender.ProductManagementDTO;
 import com.group3.apiserver.service.ProductService;
@@ -72,8 +72,8 @@ public class ProductController {
     }
 
     @PostMapping("/product")
-    public ProductManagementDTO createProduct(@RequestBody CreateProductDTO createProductParams) {
-        return productService.createProduct(
+    public ProductManagementDTO createProduct(@RequestBody modifyProductBasicInfoDTO createProductParams) {
+        return productService.modifyProductBasicInfo(
                 createProductParams.getUserId(),
                 createProductParams.getToken(),
                 createProductParams.getName(),
@@ -88,6 +88,18 @@ public class ProductController {
                 addDescriptionParams.getUserId(),
                 addDescriptionParams.getToken(),
                 addDescriptionParams.getProductDescriptionsInEntity()
+        );
+    }
+
+    @PatchMapping("/product")
+    public ProductManagementDTO modifyProduct(@RequestBody modifyProductBasicInfoDTO modifyProductParams) {
+        return productService.modifyProductBasicInfo(
+                modifyProductParams.getUserId(),
+                modifyProductParams.getToken(),
+                modifyProductParams.getProductId(),
+                modifyProductParams.getName(),
+                modifyProductParams.getCategory(),
+                modifyProductParams.getPrice()
         );
     }
 }

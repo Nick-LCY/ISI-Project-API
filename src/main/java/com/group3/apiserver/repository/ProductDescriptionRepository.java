@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Set;
 
 public interface ProductDescriptionRepository extends JpaRepository<ProductDescriptionEntity, Integer> {
-    Set<ProductDescriptionEntity> findAllByProductId(Integer productId);
+    Set<ProductDescriptionEntity> findAllByProductIdOrderBySequence(Integer productId);
 }
