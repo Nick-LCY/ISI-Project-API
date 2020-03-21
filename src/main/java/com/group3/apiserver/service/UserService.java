@@ -217,6 +217,9 @@ public class UserService {
                     shoppingCartItemRepository.findAllByUserId(userId)) {
                 shoppingCartManagementDTO.addShoppingCartItemDTO(e.getProduct(), e.getQuantity());
             }
+            if (shoppingCartManagementDTO.getShoppingCartItems() == null) {
+                shoppingCartManagementDTO.setShoppingCartItems(new LinkedList<>());
+            }
             shoppingCartManagementDTO.setSuccess(true);
         } else {
             shoppingCartManagementDTO.setSuccess(false);
