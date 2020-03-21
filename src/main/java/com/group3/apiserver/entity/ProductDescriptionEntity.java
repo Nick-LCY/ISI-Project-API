@@ -13,7 +13,6 @@ public class ProductDescriptionEntity {
     private int id;
     private String attributeName;
     private String attributeValue;
-    private int sequence;
     private int productId;
 
     @Id
@@ -48,16 +47,6 @@ public class ProductDescriptionEntity {
     }
 
     @Basic
-    @Column(name = "sequence")
-    public int getSequence() {
-        return sequence;
-    }
-
-    public void setSequence(int sequence) {
-        this.sequence = sequence;
-    }
-
-    @Basic
     @Column(name = "product_id")
     public int getProductId() {
         return productId;
@@ -73,7 +62,6 @@ public class ProductDescriptionEntity {
         if (o == null || getClass() != o.getClass()) return false;
         ProductDescriptionEntity that = (ProductDescriptionEntity) o;
         return id == that.id &&
-                sequence == that.sequence &&
                 productId == that.productId &&
                 Objects.equals(attributeName, that.attributeName) &&
                 Objects.equals(attributeValue, that.attributeValue);
@@ -81,6 +69,6 @@ public class ProductDescriptionEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, attributeName, attributeValue, sequence, productId);
+        return Objects.hash(id, attributeName, attributeValue, productId);
     }
 }

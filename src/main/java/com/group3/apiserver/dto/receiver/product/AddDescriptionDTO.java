@@ -23,7 +23,6 @@ public class AddDescriptionDTO {
             productDescription.setProductId(descriptionDTO.getProductId());
             productDescription.setAttributeName(descriptionDTO.getAttributeName());
             productDescription.setAttributeValue(descriptionDTO.getAttributeValue());
-            productDescription.setSequence(descriptionDTO.getSequence());
             productDescriptionList.add(productDescription);
         }
         return productDescriptionList;
@@ -34,7 +33,6 @@ public class AddDescriptionDTO {
     private static class DescriptionDTO {
         private String attributeName;
         private String attributeValue;
-        private Integer sequence;
         private Integer productId;
     }
 }

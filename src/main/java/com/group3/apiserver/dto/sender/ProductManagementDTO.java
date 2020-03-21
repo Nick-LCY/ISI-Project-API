@@ -43,7 +43,6 @@ public class ProductManagementDTO {
             descriptionDTO.setAttributeName(productDescription.getAttributeName());
             descriptionDTO.setAttributeValue(productDescription.getAttributeValue());
             descriptionDTO.setProductId(productDescription.getProductId());
-            descriptionDTO.setSequence(productDescription.getSequence());
             productDescriptions.add(descriptionDTO);
         }
 
@@ -66,7 +65,6 @@ public class ProductManagementDTO {
         private Integer id;
         private String attributeName;
         private String attributeValue;
-        private Integer sequence;
         private Integer productId;
     }
 }

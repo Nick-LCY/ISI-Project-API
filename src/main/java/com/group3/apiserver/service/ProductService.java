@@ -97,7 +97,7 @@ public class ProductService {
                     Double.parseDouble(product.getTotalStars().toString())
                             / Double.parseDouble(product.getTotalComments().toString()):0);
             productDetailDTO.setProductPhotographs(productPhotographRepository.findAllByProductId(productDetailDTO.getId()));
-            productDetailDTO.setProductDescriptions(productDescriptionRepository.findAllByProductIdOrderBySequence(productDetailDTO.getId()));
+            productDetailDTO.setProductDescriptions(productDescriptionRepository.findAllByProductId(productDetailDTO.getId()));
         }
         return productDetailDTO;
     }
@@ -175,8 +175,6 @@ public class ProductService {
                 ProductPhotographEntity productPhotograph = new ProductPhotographEntity();
                 productPhotograph.setProductId(productId);
                 productPhotograph.setFileLocation(photographLocation);
-                // TODO: Need to get sequence from frontend
-                productPhotograph.setSequence(1);
                 productPhotograph = productPhotographRepository.save(productPhotograph);
                 fileProcessingDTO.setSuccess(true);
                 fileProcessingDTO.setFileLink(photographLocation);

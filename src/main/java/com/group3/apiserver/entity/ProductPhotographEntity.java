@@ -12,7 +12,6 @@ import java.util.Objects;
 public class ProductPhotographEntity {
     private int id;
     private String fileLocation;
-    private int sequence;
     private int productId;
 
     @Id
@@ -37,16 +36,6 @@ public class ProductPhotographEntity {
     }
 
     @Basic
-    @Column(name = "sequence")
-    public int getSequence() {
-        return sequence;
-    }
-
-    public void setSequence(int sequence) {
-        this.sequence = sequence;
-    }
-
-    @Basic
     @Column(name = "product_id")
     public int getProductId() {
         return productId;
@@ -62,13 +51,12 @@ public class ProductPhotographEntity {
         if (o == null || getClass() != o.getClass()) return false;
         ProductPhotographEntity that = (ProductPhotographEntity) o;
         return id == that.id &&
-                sequence == that.sequence &&
                 productId == that.productId &&
                 Objects.equals(fileLocation, that.fileLocation);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, fileLocation, sequence, productId);
+        return Objects.hash(id, fileLocation, productId);
     }
 }
