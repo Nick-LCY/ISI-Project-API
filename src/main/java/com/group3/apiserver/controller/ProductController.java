@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@CrossOrigin("http://localhost:8083")
+@CrossOrigin("http://localhost:8080")
 public class ProductController {
     private ProductService productService;
 
