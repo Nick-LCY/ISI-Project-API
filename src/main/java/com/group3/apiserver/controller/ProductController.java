@@ -3,7 +3,7 @@ package com.group3.apiserver.controller;
 import com.group3.apiserver.dto.PaginationDTO;
 import com.group3.apiserver.dto.ProductDetailDTO;
 import com.group3.apiserver.dto.ProductListItemDTO;
-import com.group3.apiserver.dto.receiver.product.AddDescriptionDTO;
+import com.group3.apiserver.dto.receiver.product.ManageDescriptionDTO;
 import com.group3.apiserver.dto.receiver.product.modifyProductBasicInfoDTO;
 import com.group3.apiserver.dto.sender.FileProcessingDTO;
 import com.group3.apiserver.dto.sender.ProductManagementDTO;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@CrossOrigin("http://localhost:8080")
+@CrossOrigin("http://localhost:8083")
 public class ProductController {
     private ProductService productService;
 
@@ -82,15 +82,6 @@ public class ProductController {
         );
     }
 
-    @PostMapping("/product_description")
-    public ProductManagementDTO addProductDescription(@RequestBody AddDescriptionDTO addDescriptionParams) {
-        return productService.addDescription(
-                addDescriptionParams.getUserId(),
-                addDescriptionParams.getToken(),
-                addDescriptionParams.getProductDescriptionsInEntity()
-        );
-    }
-
     @PatchMapping("/product")
     public ProductManagementDTO modifyProduct(@RequestBody modifyProductBasicInfoDTO modifyProductParams) {
         return productService.modifyProductBasicInfo(
@@ -100,6 +91,36 @@ public class ProductController {
                 modifyProductParams.getName(),
                 modifyProductParams.getCategory(),
                 modifyProductParams.getPrice()
+        );
+    }
+
+    @PostMapping("/product_description")
+    public ProductManagementDTO addProductDescription(@RequestBody ManageDescriptionDTO addDescriptionParams) {
+        return productService.addDescription(
+                addDescriptionParams.getUserId(),
+                addDescriptionParams.getToken(),
+                addDescriptionParams.getProductId(),
+                addDescriptionParams.getProductDescriptionsInEntity()
+        );
+    }
+
+    @PatchMapping("/product_description")
+    public ProductManagementDTO modifyProductDescription(@RequestBody ManageDescriptionDTO modifyDescriptionParams) {
+        return productService.modifyDescription(
+                modifyDescriptionParams.getUserId(),
+                modifyDescriptionParams.getToken(),
+                modifyDescriptionParams.getProductId(),
+                modifyDescriptionParams.getProductDescriptionsInEntity()
+        );
+    }
+
+    @DeleteMapping("/product_description")
+    public ProductManagementDTO deleteProductDescription(@RequestBody ManageDescriptionDTO deleteDescriptionParams) {
+        return productService.deleteDescription(
+                deleteDescriptionParams.getUserId(),
+                deleteDescriptionParams.getToken(),
+                deleteDescriptionParams.getProductId(),
+                deleteDescriptionParams.getProductDescriptionsInEntity()
         );
     }
 }

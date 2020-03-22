@@ -3,7 +3,6 @@ package com.group3.apiserver.dto.sender;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.group3.apiserver.dto.receiver.product.AddDescriptionDTO;
 import com.group3.apiserver.entity.ProductDescriptionEntity;
 import lombok.Data;
 

@@ -61,9 +61,14 @@ public class ProductService {
         this.productDescriptionRepository = productDescriptionRepository;
     }
 
-    public PaginationDTO<ProductListItemDTO> findProducts(Integer page, String key, String category, Integer orderBy) {
-        Pageable pageable = PageRequest.of(page - 1, 8, orderBy>0?Sort.by("price"):Sort.by("price").descending());
-        Page<ProductEntity> productPage = productRepository.findAllByNameLikeAndCategoryLike("%" + key + "%", category, pageable);
+    public PaginationDTO<ProductListItemDTO> findProducts(Integer page,
+                                                          String key,
+                                                          String category,
+                                                          Integer orderBy) {
+        Pageable pageable = PageRequest.of(page - 1,
+                8, orderBy>0?Sort.by("price"):Sort.by("price").descending());
+        Page<ProductEntity> productPage =
+                productRepository.findAllByNameLikeAndCategoryLike("%" + key + "%", category, pageable);
 
         PaginationDTO<ProductListItemDTO> paginationDTO = new PaginationDTO<>();
         paginationDTO.setCurrentPage(page);
@@ -102,7 +107,10 @@ public class ProductService {
         return productDetailDTO;
     }
 
-    public FileProcessingDTO uploadThumbnail(MultipartFile thumbnail, Integer userId, Integer productId, String token) {
+    public FileProcessingDTO uploadThumbnail(MultipartFile thumbnail,
+                                             Integer userId,
+                                             Integer productId,
+                                             String token) {
         FileProcessingDTO fileProcessingDTO = new FileProcessingDTO();
         if (authenticationUtil.vendorAuthentication(userId, token)) {
             Optional<ProductEntity> productOptional = productRepository.findById(productId);
@@ -133,7 +141,9 @@ public class ProductService {
         return fileProcessingDTO;
     }
 
-    public FileProcessingDTO deleteThumbnail(Integer userId, String token, Integer productId) {
+    public FileProcessingDTO deleteThumbnail(Integer userId,
+                                             String token,
+                                             Integer productId) {
         FileProcessingDTO fileProcessingDTO = new FileProcessingDTO();
         if (authenticationUtil.vendorAuthentication(userId, token)) {
             Optional<ProductEntity> productOptional = productRepository.findById(productId);
@@ -159,7 +169,10 @@ public class ProductService {
         return fileProcessingDTO;
     }
 
-    public FileProcessingDTO uploadPhotograph(MultipartFile photograph, Integer userId, Integer productId, String token) {
+    public FileProcessingDTO uploadPhotograph(MultipartFile photograph,
+                                              Integer userId,
+                                              Integer productId,
+                                              String token) {
         FileProcessingDTO fileProcessingDTO = new FileProcessingDTO();
         if (authenticationUtil.vendorAuthentication(userId, token)) {
             Optional<ProductEntity> productOptional = productRepository.findById(productId);
@@ -190,7 +203,10 @@ public class ProductService {
         return fileProcessingDTO;
     }
 
-    public FileProcessingDTO deletePhotograph(Integer userId, String token, Integer productId, Integer photographId) {
+    public FileProcessingDTO deletePhotograph(Integer userId,
+                                              String token,
+                                              Integer productId,
+                                              Integer photographId) {
         FileProcessingDTO fileProcessingDTO = new FileProcessingDTO();
         if (authenticationUtil.vendorAuthentication(userId, token)) {
             Optional<ProductEntity> productOptional = productRepository.findById(productId);
@@ -221,7 +237,11 @@ public class ProductService {
         return fileProcessingDTO;
     }
 
-    public ProductManagementDTO modifyProductBasicInfo(Integer userId, String token, String name, String category, Double price) {
+    public ProductManagementDTO modifyProductBasicInfo(Integer userId,
+                                                       String token,
+                                                       String name,
+                                                       String category,
+                                                       Double price) {
         ProductManagementDTO productManagementDTO = new ProductManagementDTO();
         if (authenticationUtil.vendorAuthentication(userId, token)) {
             ProductEntity product = new ProductEntity();
@@ -270,19 +290,69 @@ public class ProductService {
         return productManagementDTO;
     }
 
-    public ProductManagementDTO addDescription(Integer userId, String token, List<ProductDescriptionEntity> productDescriptions) {
+    public ProductManagementDTO addDescription(Integer userId,
+                                               String token,
+                                               Integer productId,
+                                               List<ProductDescriptionEntity> productDescriptions) {
         ProductManagementDTO productManagementDTO = new ProductManagementDTO();
         if (authenticationUtil.vendorAuthentication(userId, token)) {
-            Integer productId = productDescriptions.get(0).getProductId();
             Optional<ProductEntity> productOptional = productRepository.findById(productId);
             if (productOptional.isPresent()) {
-                List<ProductDescriptionEntity> productDescriptionList = new LinkedList<>();
                 for (ProductDescriptionEntity productDescription :
                         productDescriptions) {
-                    productDescriptionList.add(productDescriptionRepository.save(productDescription));
+                    productDescriptionRepository.save(productDescription);
                 }
                 productManagementDTO.setSuccess(true);
-                productManagementDTO.addProductDescriptions(productDescriptionList);
+            } else {
+                productManagementDTO.setSuccess(false);
+                productManagementDTO.setMessage(ErrorMessage.PRODUCT_NOT_FOUND);
+            }
+        } else {
+            productManagementDTO.setSuccess(false);
+            productManagementDTO.setMessage(ErrorMessage.AUTHENTICATION_FAIL);
+        }
+        return productManagementDTO;
+    }
+
+    public ProductManagementDTO modifyDescription(Integer userId,
+                                                  String token,
+                                                  Integer productId,
+                                                  List<ProductDescriptionEntity> productDescriptions) {
+        ProductManagementDTO productManagementDTO = new ProductManagementDTO();
+        if (authenticationUtil.vendorAuthentication(userId, token)) {
+            Optional<ProductEntity> productOptional = productRepository.findById(productId);
+            if (productOptional.isPresent()) {
+                for (ProductDescriptionEntity productDescription :
+                        productDescriptions) {
+                    if (productDescription.getId() != 0) {
+                        productDescriptionRepository.save(productDescription);
+                    }
+                }
+                productManagementDTO.setSuccess(true);
+            } else {
+                productManagementDTO.setSuccess(false);
+                productManagementDTO.setMessage(ErrorMessage.PRODUCT_NOT_FOUND);
+            }
+        } else {
+            productManagementDTO.setSuccess(false);
+            productManagementDTO.setMessage(ErrorMessage.AUTHENTICATION_FAIL);
+        }
+        return productManagementDTO;
+    }
+
+    public ProductManagementDTO deleteDescription(Integer userId,
+                                                  String token,
+                                                  Integer productId,
+                                                  List<ProductDescriptionEntity> productDescriptions) {
+        ProductManagementDTO productManagementDTO = new ProductManagementDTO();
+        if (authenticationUtil.vendorAuthentication(userId, token)) {
+            Optional<ProductEntity> productOptional = productRepository.findById(productId);
+            if (productOptional.isPresent()) {
+                for (ProductDescriptionEntity productDescription :
+                        productDescriptions) {
+                    productDescriptionRepository.deleteById(productDescription.getId());
+                }
+                productManagementDTO.setSuccess(true);
             } else {
                 productManagementDTO.setSuccess(false);
                 productManagementDTO.setMessage(ErrorMessage.PRODUCT_NOT_FOUND);
