@@ -1,7 +1,8 @@
 package com.group3.apiserver.controller;
 
-import com.group3.apiserver.dto.receiver.CreatePurchaseOrderDTO;
+import com.group3.apiserver.dto.receiver.purchaseorder.CreatePurchaseOrderDTO;
 import com.group3.apiserver.dto.purchaseorder.PurchaseManagementDTO;
+import com.group3.apiserver.dto.receiver.purchaseorder.ModifyPurchaseOrderDTO;
 import com.group3.apiserver.service.PurchaseOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -22,11 +23,13 @@ public class PurchaseOrderController {
     }
 
     @PatchMapping("/purchase_order")
-    public PurchaseManagementDTO updatePurchaseOrderStatus(@RequestParam(name = "user_id") Integer userId,
-                                                           @RequestParam(name = "token") String token,
-                                                           @RequestParam(name = "po_no") Integer purchaseOrderId,
-                                                           @RequestParam(name = "status") Integer status) {
-        return purchaseOrderService.updatePurchaseOrderStatus(userId, token, purchaseOrderId, status);
+    public PurchaseManagementDTO updatePurchaseOrderStatus(@RequestBody ModifyPurchaseOrderDTO modifyPurchaseOrderDTO) {
+        return purchaseOrderService.updatePurchaseOrderStatus(
+                modifyPurchaseOrderDTO.getUserId(),
+                modifyPurchaseOrderDTO.getToken(),
+                modifyPurchaseOrderDTO.getPurchaseOrderId(),
+                modifyPurchaseOrderDTO.getStatus()
+        );
     }
 
     @GetMapping("/purchase_orders")

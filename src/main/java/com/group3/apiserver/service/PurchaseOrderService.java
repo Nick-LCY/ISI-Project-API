@@ -1,6 +1,6 @@
 package com.group3.apiserver.service;
 
-import com.group3.apiserver.dto.receiver.CreatePurchaseOrderDTO;
+import com.group3.apiserver.dto.receiver.purchaseorder.CreatePurchaseOrderDTO;
 import com.group3.apiserver.dto.purchaseorder.PurchaseManagementDTO;
 import com.group3.apiserver.dto.purchaseorder.list.PurchaseOrderListDTO;
 import com.group3.apiserver.dto.purchaseorder.detail.PurchaseDetailDTO;
@@ -145,8 +145,14 @@ public class PurchaseOrderService {
         return purchaseManagementDTO;
     }
 
-    public PurchaseManagementDTO updatePurchaseOrderStatus(Integer userId, String token, Integer purchaseOrderId, Integer status) {
+    public PurchaseManagementDTO updatePurchaseOrderStatus(Integer userId, String token, Integer purchaseOrderId, String statusInString) {
         PurchaseManagementDTO purchaseManagementDTO = new PurchaseManagementDTO();
+        int status = 0;
+        for (int i = 0; i < 4; i++) {
+            if (statusList[i].equals(statusInString)) {
+                status = i;
+            }
+        }
         // User authentication
         if (authenticationUtil.userAuthentication(userId, token)) {
             Optional<PurchaseOrderEntity> purchaseOrderOptional = purchaseOrderRepository.findById(purchaseOrderId);
