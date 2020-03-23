@@ -10,10 +10,7 @@ import com.group3.apiserver.entity.PurchaseDetailEntity;
 import com.group3.apiserver.entity.PurchaseOrderEntity;
 import com.group3.apiserver.entity.UserEntity;
 import com.group3.apiserver.message.ErrorMessage;
-import com.group3.apiserver.repository.ProductRepository;
-import com.group3.apiserver.repository.PurchaseDetailRepository;
-import com.group3.apiserver.repository.PurchaseOrderRepository;
-import com.group3.apiserver.repository.UserRepository;
+import com.group3.apiserver.repository.*;
 import com.group3.apiserver.util.AuthenticationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,6 +32,7 @@ public class PurchaseOrderService {
     private ProductRepository productRepository;
     private PurchaseOrderRepository purchaseOrderRepository;
     private UserRepository userRepository;
+    private ShoppingCartItemRepository shoppingCartItemRepository;
 
     @Autowired
     public void setAuthenticationUtil(AuthenticationUtil authenticationUtil) {
@@ -59,6 +57,11 @@ public class PurchaseOrderService {
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    @Autowired
+    public void setShoppingCartItemRepository(ShoppingCartItemRepository shoppingCartItemRepository) {
+        this.shoppingCartItemRepository = shoppingCartItemRepository;
     }
 
     @Transactional
@@ -100,13 +103,13 @@ public class PurchaseOrderService {
                 // Purchase detail's basic info
                 purchaseDetail.setPurchaseOrderId(purchaseOrderId);
 
-                purchaseDetail.setProductId(item.getProductId());
-                purchaseDetailDTO.setProductId(item.getProductId());
+                purchaseDetail.setProductId(item.getId());
+                purchaseDetailDTO.setProductId(item.getId());
 
                 purchaseDetail.setQuantity(item.getQuantity());
                 purchaseDetailDTO.setQuantity(item.getQuantity());
                 // Historical data
-                Optional<ProductEntity> productOptional = productRepository.findById(item.getProductId());
+                Optional<ProductEntity> productOptional = productRepository.findById(item.getId());
                 if (productOptional.isPresent()) {
                     purchaseDetail.setProductName(productOptional.get().getName());
                     purchaseDetailDTO.setProductName(productOptional.get().getName());
@@ -129,6 +132,9 @@ public class PurchaseOrderService {
             purchaseOrderDTO.setTotalAmount(totalAmount);
             purchaseOrder.setTotalAmount(totalAmount);
             purchaseOrderRepository.save(purchaseOrder);
+
+            // Clean shopping cart items
+            shoppingCartItemRepository.deleteAll(shoppingCartItemRepository.findAllByUserId(createPurchaseOrderDTO.getUserId()));
 
             purchaseManagementDTO.setSuccess(true);
             purchaseManagementDTO.setPurchaseDetail(purchaseOrderDTO);

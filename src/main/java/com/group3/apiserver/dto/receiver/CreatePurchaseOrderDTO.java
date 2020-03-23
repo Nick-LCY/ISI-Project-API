@@ -15,7 +15,7 @@ public class CreatePurchaseOrderDTO {
     @Data
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
     public static class PurchaseItem {
-        private Integer productId;
+        private Integer id;
         private Integer quantity;
     }
 }
