@@ -255,7 +255,7 @@ public class PurchaseOrderService {
             UserEntity user = userOptional.orElse(new UserEntity());
             if (purchaseOrderOptional.isPresent()) {
                 PurchaseOrderEntity purchaseOrder = purchaseOrderOptional.get();
-                if (purchaseOrder.getUserId() != userId) {
+                if (!authenticationUtil.vendorAuthentication(userId, token) && purchaseOrder.getUserId() != userId) {
                     purchaseManagementDTO.setSuccess(false);
                     purchaseManagementDTO.setMessage(ErrorMessage.HAVE_NO_RIGHT);
                     return purchaseManagementDTO;
