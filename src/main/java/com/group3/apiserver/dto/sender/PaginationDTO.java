@@ -1,4 +1,4 @@
-package com.group3.apiserver.dto;
+package com.group3.apiserver.dto.sender;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

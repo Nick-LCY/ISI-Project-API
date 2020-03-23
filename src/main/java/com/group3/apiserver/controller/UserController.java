@@ -1,7 +1,7 @@
 package com.group3.apiserver.controller;
 
-import com.group3.apiserver.dto.*;
 import com.group3.apiserver.dto.receiver.user.*;
+import com.group3.apiserver.dto.sender.*;
 import com.group3.apiserver.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

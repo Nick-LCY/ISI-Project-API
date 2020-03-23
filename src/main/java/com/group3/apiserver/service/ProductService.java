@@ -1,10 +1,10 @@
 package com.group3.apiserver.service;
 
-import com.group3.apiserver.dto.PaginationDTO;
-import com.group3.apiserver.dto.ProductDetailDTO;
-import com.group3.apiserver.dto.ProductListItemDTO;
+import com.group3.apiserver.dto.sender.PaginationDTO;
+import com.group3.apiserver.dto.sender.product.ProductDetailDTO;
+import com.group3.apiserver.dto.sender.product.ProductListItemDTO;
 import com.group3.apiserver.dto.sender.FileProcessingDTO;
-import com.group3.apiserver.dto.sender.ProductManagementDTO;
+import com.group3.apiserver.dto.sender.product.ProductManagementDTO;
 import com.group3.apiserver.entity.ProductDescriptionEntity;
 import com.group3.apiserver.entity.ProductEntity;
 import com.group3.apiserver.entity.ProductPhotographEntity;

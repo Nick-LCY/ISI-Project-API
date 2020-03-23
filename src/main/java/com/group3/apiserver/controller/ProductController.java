@@ -1,12 +1,12 @@
 package com.group3.apiserver.controller;
 
-import com.group3.apiserver.dto.PaginationDTO;
-import com.group3.apiserver.dto.ProductDetailDTO;
-import com.group3.apiserver.dto.ProductListItemDTO;
+import com.group3.apiserver.dto.sender.PaginationDTO;
+import com.group3.apiserver.dto.sender.product.ProductDetailDTO;
+import com.group3.apiserver.dto.sender.product.ProductListItemDTO;
 import com.group3.apiserver.dto.receiver.product.ManageDescriptionDTO;
 import com.group3.apiserver.dto.receiver.product.modifyProductBasicInfoDTO;
 import com.group3.apiserver.dto.sender.FileProcessingDTO;
-import com.group3.apiserver.dto.sender.ProductManagementDTO;
+import com.group3.apiserver.dto.sender.product.ProductManagementDTO;
 import com.group3.apiserver.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
