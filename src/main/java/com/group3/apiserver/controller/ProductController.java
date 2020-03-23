@@ -115,12 +115,10 @@ public class ProductController {
     }
 
     @DeleteMapping("/product_description")
-    public ProductManagementDTO deleteProductDescription(@RequestBody ManageDescriptionDTO deleteDescriptionParams) {
-        return productService.deleteDescription(
-                deleteDescriptionParams.getUserId(),
-                deleteDescriptionParams.getToken(),
-                deleteDescriptionParams.getProductId(),
-                deleteDescriptionParams.getProductDescriptionsInEntity()
-        );
+    public ProductManagementDTO deleteProductDescription(@RequestParam("user_id") Integer userId,
+                                                         @RequestParam("token") String token,
+                                                         @RequestParam("product_id") Integer productId,
+                                                         @RequestParam("des_id") Integer descriptionId) {
+        return productService.deleteDescription(userId, token, productId, descriptionId);
     }
 }

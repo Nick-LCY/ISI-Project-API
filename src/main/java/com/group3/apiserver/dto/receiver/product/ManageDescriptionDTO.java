@@ -1,5 +1,6 @@
 package com.group3.apiserver.dto.receiver.product;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.group3.apiserver.entity.ProductDescriptionEntity;

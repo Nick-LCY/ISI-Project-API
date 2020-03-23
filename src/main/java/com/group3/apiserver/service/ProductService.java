@@ -343,15 +343,12 @@ public class ProductService {
     public ProductManagementDTO deleteDescription(Integer userId,
                                                   String token,
                                                   Integer productId,
-                                                  List<ProductDescriptionEntity> productDescriptions) {
+                                                  Integer descriptionId) {
         ProductManagementDTO productManagementDTO = new ProductManagementDTO();
         if (authenticationUtil.vendorAuthentication(userId, token)) {
             Optional<ProductEntity> productOptional = productRepository.findById(productId);
             if (productOptional.isPresent()) {
-                for (ProductDescriptionEntity productDescription :
-                        productDescriptions) {
-                    productDescriptionRepository.deleteById(productDescription.getId());
-                }
+                productDescriptionRepository.deleteById(descriptionId);
                 productManagementDTO.setSuccess(true);
             } else {
                 productManagementDTO.setSuccess(false);
