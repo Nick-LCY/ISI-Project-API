@@ -20,7 +20,7 @@ public class PurchaseOrderDTO {
     private String purchaseDate;
     private String shipmentDate;
     private String cancelDate;
-    private Integer cancelledBy;
+    private String cancelledBy;
     @JsonProperty("status")
     private String statusInString;
     private BigDecimal totalAmount;
