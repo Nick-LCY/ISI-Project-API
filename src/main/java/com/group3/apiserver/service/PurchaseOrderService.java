@@ -1,10 +1,10 @@
 package com.group3.apiserver.service;
 
 import com.group3.apiserver.dto.receiver.purchaseorder.CreatePurchaseOrderDTO;
-import com.group3.apiserver.dto.purchaseorder.PurchaseManagementDTO;
-import com.group3.apiserver.dto.purchaseorder.list.PurchaseOrderListDTO;
-import com.group3.apiserver.dto.purchaseorder.detail.PurchaseDetailDTO;
-import com.group3.apiserver.dto.purchaseorder.detail.PurchaseOrderDTO;
+import com.group3.apiserver.dto.sender.purchaseorder.PurchaseManagementDTO;
+import com.group3.apiserver.dto.sender.purchaseorder.list.PurchaseOrderListDTO;
+import com.group3.apiserver.dto.sender.purchaseorder.detail.PurchaseDetailDTO;
+import com.group3.apiserver.dto.sender.purchaseorder.detail.PurchaseOrderDTO;
 import com.group3.apiserver.entity.ProductEntity;
 import com.group3.apiserver.entity.PurchaseDetailEntity;
 import com.group3.apiserver.entity.PurchaseOrderEntity;
@@ -25,7 +25,7 @@ import java.util.Random;
 
 @Service
 public class PurchaseOrderService {
-    private final String[] statusList = {"pending", "hold", "shipped", "cancelled"};
+    private final String[] STATUS_LIST = {"pending", "hold", "shipped", "cancelled"};
 
     private AuthenticationUtil authenticationUtil;
     private PurchaseDetailRepository purchaseDetailRepository;
@@ -87,7 +87,7 @@ public class PurchaseOrderService {
             purchaseOrderDTO.setPurchaseDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(timestamp));
 
             purchaseOrder.setStatus(0);
-            purchaseOrderDTO.setStatusInString(statusList[0]);
+            purchaseOrderDTO.setStatusInString(STATUS_LIST[0]);
 
             // Temporary set 0
             purchaseOrder.setTotalAmount(BigDecimal.valueOf(0));
@@ -149,7 +149,7 @@ public class PurchaseOrderService {
         PurchaseManagementDTO purchaseManagementDTO = new PurchaseManagementDTO();
         int status = 0;
         for (int i = 0; i < 4; i++) {
-            if (statusList[i].equals(statusInString)) {
+            if (STATUS_LIST[i].equals(statusInString)) {
                 status = i;
             }
         }
@@ -230,7 +230,7 @@ public class PurchaseOrderService {
                 PurchaseOrderListDTO purchaseOrderListDTO = new PurchaseOrderListDTO();
                 purchaseOrderListDTO.setPurchaseOrderId(purchaseOrder.getId());
                 purchaseOrderListDTO.setPurchaseDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Double.valueOf(purchaseOrder.getPurchaseDate())));
-                purchaseOrderListDTO.setStatusInString(statusList[purchaseOrder.getStatus()]);
+                purchaseOrderListDTO.setStatusInString(STATUS_LIST[purchaseOrder.getStatus()]);
                 purchaseOrderListDTO.setTotalAmount(purchaseOrder.getTotalAmount());
                 assert userRepository.findById(purchaseOrder.getUserId()).isPresent();
                 purchaseOrderListDTO.setCustomerName(isVendor?userRepository.findById(purchaseOrder.getUserId()).get().getName():null);
@@ -274,7 +274,7 @@ public class PurchaseOrderService {
                     purchaseOrderDTO.setCancelDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Double.valueOf(purchaseOrder.getCancelDate())));
                 }
                 purchaseOrderDTO.setCancelledBy(purchaseOrder.getCancelledBy());
-                purchaseOrderDTO.setStatusInString(statusList[purchaseOrder.getStatus()]);
+                purchaseOrderDTO.setStatusInString(STATUS_LIST[purchaseOrder.getStatus()]);
                 purchaseOrderDTO.setTotalAmount(purchaseOrder.getTotalAmount());
                 purchaseOrderDTO.setCustomerName(user.getName());
                 purchaseOrderDTO.setShippingAddress(user.getShippingAddr());

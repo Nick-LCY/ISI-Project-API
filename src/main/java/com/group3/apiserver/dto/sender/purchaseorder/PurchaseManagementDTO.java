@@ -1,11 +1,11 @@
-package com.group3.apiserver.dto.purchaseorder;
+package com.group3.apiserver.dto.sender.purchaseorder;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.group3.apiserver.dto.purchaseorder.detail.PurchaseOrderDTO;
-import com.group3.apiserver.dto.purchaseorder.list.PurchaseOrderListDTO;
+import com.group3.apiserver.dto.sender.purchaseorder.detail.PurchaseOrderDTO;
+import com.group3.apiserver.dto.sender.purchaseorder.list.PurchaseOrderListDTO;
 import lombok.Data;
 
 import java.util.List;

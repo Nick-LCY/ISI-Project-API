@@ -1,4 +1,4 @@
-package com.group3.apiserver.dto.sender;
+package com.group3.apiserver.dto.sender.review;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
@@ -8,9 +8,8 @@ import lombok.Data;
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ReviewDTO {
-    private String userName;
-    private Integer stars;
-    private String content;
-    private String commentDate;
+public class ReviewManagementDTO {
+    private boolean success;
+    private String message;
+    private Integer productId;
 }

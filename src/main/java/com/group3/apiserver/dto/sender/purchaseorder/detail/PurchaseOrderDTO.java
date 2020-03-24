@@ -1,4 +1,4 @@
-package com.group3.apiserver.dto.purchaseorder.detail;
+package com.group3.apiserver.dto.sender.purchaseorder.detail;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
