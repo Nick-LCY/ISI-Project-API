@@ -274,7 +274,11 @@ public class PurchaseOrderService {
                     purchaseOrderDTO.setCancelDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Double.valueOf(purchaseOrder.getCancelDate())));
                 }
                 // 0 represents user, 1 represents vendor
-                purchaseOrderDTO.setCancelledBy(purchaseOrder.getCancelledBy() == 1?"vendor":user.getName());
+                purchaseOrderDTO.setCancelledBy(purchaseOrder.getCancelledBy() == null ?
+                        null :
+                        purchaseOrder.getCancelledBy() == 1 ?
+                                "vendor" :
+                                user.getName());
                 purchaseOrderDTO.setStatusInString(STATUS_LIST[purchaseOrder.getStatus()]);
                 purchaseOrderDTO.setTotalAmount(purchaseOrder.getTotalAmount());
                 purchaseOrderDTO.setCustomerName(user.getName());
