@@ -69,27 +69,40 @@ public class ProductService {
                 8, orderBy>0?Sort.by("price"):Sort.by("price").descending());
         Page<ProductEntity> productPage =
                 productRepository.findAllByNameLikeAndCategoryLike("%" + key + "%", category, pageable);
+        // Check if vendor search product by product id
+        Optional<ProductEntity> productFindByIdOptional = Optional.empty();
+        try {
+            productFindByIdOptional = productRepository.findById(Integer.valueOf(key));
+        } catch (Exception ignored) {}
 
         PaginationDTO<ProductListItemDTO> paginationDTO = new PaginationDTO<>();
         paginationDTO.setCurrentPage(page);
         paginationDTO.setTotalPages(productPage.getTotalPages());
         paginationDTO.setItemList(new LinkedList<>());
-        for (ProductEntity product :
-                productPage.toList()) {
-            ProductListItemDTO productListItemDTO = new ProductListItemDTO();
-            productListItemDTO.setId(product.getId());
-            productListItemDTO.setName(product.getName());
-            productListItemDTO.setCategory(product.getCategory());
-            productListItemDTO.setPrice(product.getPrice());
-            productListItemDTO.setOutOfStock(product.getOutOfStock());
-            productListItemDTO.setRating(product.getTotalComments() != 0?
-                    Double.parseDouble(product.getTotalStars().toString())
-                            / Double.parseDouble(product.getTotalComments().toString()):0);
-            productListItemDTO.setThumbnailLocation(product.getThumbnailLocation());
-            paginationDTO.getItemList().add(productListItemDTO);
+        // If get the exist product by product id, then only return it
+        if (productFindByIdOptional.isPresent()) {
+            paginationDTO.getItemList().add(covertToProductListItemDTO(productFindByIdOptional.get()));
+        } else {
+            for (ProductEntity product :
+                    productPage.toList()) {
+                paginationDTO.getItemList().add(covertToProductListItemDTO(product));
+            }
         }
-
         return paginationDTO;
+    }
+
+    private ProductListItemDTO covertToProductListItemDTO(ProductEntity product) {
+        ProductListItemDTO productListItemDTO = new ProductListItemDTO();
+        productListItemDTO.setId(product.getId());
+        productListItemDTO.setName(product.getName());
+        productListItemDTO.setCategory(product.getCategory());
+        productListItemDTO.setPrice(product.getPrice());
+        productListItemDTO.setOutOfStock(product.getOutOfStock());
+        productListItemDTO.setRating(product.getTotalComments() != 0?
+                Double.parseDouble(product.getTotalStars().toString())
+                        / Double.parseDouble(product.getTotalComments().toString()):0);
+        productListItemDTO.setThumbnailLocation(product.getThumbnailLocation());
+        return productListItemDTO;
     }
 
     public ProductDetailDTO findProduct(Integer id) {
