@@ -251,11 +251,14 @@ public class PurchaseOrderService {
         if (authenticationUtil.userAuthentication(userId, token)) {
             // Try to find the purchase order
             Optional<PurchaseOrderEntity> purchaseOrderOptional = purchaseOrderRepository.findById(purchaseOrderId);
-            Optional<UserEntity> userOptional = userRepository.findById(userId);
-            UserEntity user = userOptional.orElse(new UserEntity());
             if (purchaseOrderOptional.isPresent()) {
                 PurchaseOrderEntity purchaseOrder = purchaseOrderOptional.get();
-                if (!authenticationUtil.vendorAuthentication(userId, token) && purchaseOrder.getUserId() != userId) {
+                // Get corresponding user
+                Optional<UserEntity> userOptional = userRepository.findById(purchaseOrder.getUserId());
+                UserEntity user = userOptional.orElse(new UserEntity());
+
+                Boolean isVendor = authenticationUtil.vendorAuthentication(userId, token);
+                if (!isVendor && purchaseOrder.getUserId() != userId) {
                     purchaseManagementDTO.setSuccess(false);
                     purchaseManagementDTO.setMessage(ErrorMessage.HAVE_NO_RIGHT);
                     return purchaseManagementDTO;
