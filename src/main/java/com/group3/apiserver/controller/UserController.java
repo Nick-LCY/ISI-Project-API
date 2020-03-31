@@ -2,7 +2,7 @@ package com.group3.apiserver.controller;
 
 import com.group3.apiserver.dto.receiver.user.*;
 import com.group3.apiserver.dto.sender.*;
-import com.group3.apiserver.dto.sender.review.ReviewDTO;
+import com.group3.apiserver.dto.sender.review.ReviewListDTO;
 import com.group3.apiserver.dto.sender.review.ReviewManagementDTO;
 import com.group3.apiserver.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,8 +80,7 @@ public class UserController {
     }
 
     @GetMapping("/reviews")
-    public PaginationDTO<ReviewDTO> getReviews(@RequestParam(name = "product_id") Integer productId,
-                                               @RequestParam(name = "page") Integer page) {
-        return userService.getReviews(productId, page);
+    public ReviewListDTO getReviews(@RequestParam(name = "product_id") Integer productId) {
+        return userService.getReviews(productId);
     }
 }

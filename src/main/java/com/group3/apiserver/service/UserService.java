@@ -1,7 +1,7 @@
 package com.group3.apiserver.service;
 
 import com.group3.apiserver.dto.sender.*;
-import com.group3.apiserver.dto.sender.review.ReviewDTO;
+import com.group3.apiserver.dto.sender.review.ReviewListDTO;
 import com.group3.apiserver.dto.sender.review.ReviewManagementDTO;
 import com.group3.apiserver.entity.*;
 import com.group3.apiserver.message.ErrorMessage;
@@ -15,10 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
-import java.util.LinkedList;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Pattern;
 
 @Service
@@ -323,28 +320,15 @@ public class UserService {
         return reviewManagementDTO;
     }
 
-    public PaginationDTO<ReviewDTO> getReviews(Integer productId, Integer page) {
-        PaginationDTO<ReviewDTO> paginationDTO = new PaginationDTO<>();
-        Pageable pageable = PageRequest.of(page - 1, 10);
-        Page<ReviewEntity> reviewPages = reviewRepository.findAllByProductId(productId, pageable);
-        // Construct paginationDTO
-        paginationDTO.setCurrentPage(page);
-        paginationDTO.setTotalPages(reviewPages.getTotalPages());
-        paginationDTO.setItemList(new LinkedList<>());
+    public ReviewListDTO getReviews(Integer productId) {
+        ReviewListDTO reviewListDTO = new ReviewListDTO();
+        List<ReviewEntity> reviewList = reviewRepository.findAllByProductId(productId);
         for (ReviewEntity review :
-                reviewPages) {
-            ReviewDTO reviewDTO = new ReviewDTO();
-            reviewDTO.setStars(review.getStars());
-            reviewDTO.setContent(review.getContent());
-            reviewDTO.setCommentDate(
-                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(
-                            Double.valueOf(review.getCommentDate())));
-
+                reviewList) {
             purchaseOrderRepository.findById(review.getPurchaseOrderId()).flatMap(purchaseOrderEntity ->
                     userRepository.findById(purchaseOrderEntity.getUserId())).ifPresent(userEntity ->
-                        reviewDTO.setUserName(userEntity.getName()));
-            paginationDTO.getItemList().add(reviewDTO);
+                        reviewListDTO.addReviewDTO(review, userEntity.getName()));
         }
-        return paginationDTO;
+        return reviewListDTO;
     }
 }
