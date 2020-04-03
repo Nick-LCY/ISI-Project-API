@@ -19,11 +19,13 @@ public class ReviewListDTO {
         this.reviews = new LinkedList<>();
     }
     private List<ReviewDetailDTO> reviews;
-    public void addReviewDTO(ReviewEntity review, String userName) {
+    public void addReviewDTO(ReviewEntity review, String userName, Integer userId) {
         ReviewDetailDTO reviewDetailDTO = new ReviewDetailDTO();
         reviewDetailDTO.setUserName(userName);
         reviewDetailDTO.setStars(review.getStars());
         reviewDetailDTO.setContent(review.getContent());
+        reviewDetailDTO.setPurchaseOrderId(review.getPurchaseOrderId());
+        reviewDetailDTO.setUserId(userId);
         reviewDetailDTO.setCommentDate(
                 new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(
                         Double.valueOf(review.getCommentDate())));
@@ -33,6 +35,9 @@ public class ReviewListDTO {
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private static class ReviewDetailDTO {
+        @JsonProperty("po_no")
+        private Integer purchaseOrderId;
+        private Integer userId;
         @JsonProperty("author")
         private String userName;
         @JsonProperty("rate")

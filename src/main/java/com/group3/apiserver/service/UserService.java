@@ -327,7 +327,7 @@ public class UserService {
                 reviewList) {
             purchaseOrderRepository.findById(review.getPurchaseOrderId()).flatMap(purchaseOrderEntity ->
                     userRepository.findById(purchaseOrderEntity.getUserId())).ifPresent(userEntity ->
-                        reviewListDTO.addReviewDTO(review, userEntity.getName()));
+                        reviewListDTO.addReviewDTO(review, userEntity.getName(), userEntity.getId()));
         }
         return reviewListDTO;
     }
