@@ -83,4 +83,9 @@ public class UserController {
     public ReviewListDTO getReviews(@RequestParam(name = "product_id") Integer productId) {
         return userService.getReviews(productId);
     }
+
+    @PatchMapping("/review")
+    public ReviewManagementDTO updateUserReview(@RequestBody SaveUserReviewDTO saveUserReviewDTO) {
+        return saveUserReview(saveUserReviewDTO);
+    }
 }
